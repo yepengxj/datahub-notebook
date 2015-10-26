@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/asiainfoLDP/datahub-client/cmd"
 	"github.com/asiainfoLDP/datahub-client/daemon/daemonigo"
 	"io/ioutil"
 	"log"
@@ -15,6 +16,8 @@ import (
 	"syscall"
 	"time"
 )
+
+const g_strDpPath string = "/var/lib/datahub/"
 
 type StoppableListener struct {
 	*net.UnixListener          //Wrapped listener
@@ -126,6 +129,17 @@ func dpHttp(rw http.ResponseWriter, r *http.Request) {
 
 }
 
+func isDirExists(path string) bool {
+	fi, err := os.Stat(path)
+
+	if err != nil {
+		return os.IsExist(err)
+	} else {
+		return fi.IsDir()
+	}
+	panic("not reached")
+}
+
 func RunDaemon() {
 	fmt.Println("run daemon..")
 	// Daemonizing echo server application.
@@ -137,8 +151,15 @@ func RunDaemon() {
 	}
 	fmt.Printf("server := http.Server{}\n")
 
-	os.Chdir("/tmp/datahub")
-	originalListener, err := net.Listen("unix", "/tmp/datahub.sock")
+	if false == isDirExists(g_strDpPath) {
+		err := os.MkdirAll(g_strDpPath, 0755)
+		if err != nil {
+			fmt.Printf("mkdir %s error! %v ", g_strDpPath, err)
+		}
+
+	}
+	os.Chdir(g_strDpPath)
+	originalListener, err := net.Listen("unix", cmd.UnixSock)
 	if err != nil {
 		panic(err)
 	}

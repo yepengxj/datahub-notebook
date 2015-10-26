@@ -36,7 +36,7 @@ type UserInfo struct {
 var (
 	User     = UserInfo{}
 	Matches  = make([]string, 0, len(Cmds))
-	UnixSock = "/tmp/datahub.sock"
+	UnixSock = "/var/run/datahub.sock"
 	Running  = true
 	Logged   = false
 )
