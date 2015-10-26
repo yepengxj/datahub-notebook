@@ -41,6 +41,7 @@ var AppName = "daemon"
 var AppPath = "./" + filepath.Base(os.Args[0])
 
 // Absolute or relative path from working directory to PID file.
+
 var PidFile = "/var/run/datahub.pid"
 
 // Pointer to PID file to keep file-lock alive.
@@ -62,7 +63,8 @@ func Daemonize() (isDaemon bool, err error) {
 		}
 	}
 	if isDaemon {
-		syscall.Umask(int(Umask))
+		oldmask := syscall.Umask(int(Umask))
+		defer syscall.Umask(oldmask)
 		if _, err = syscall.Setsid(); err != nil {
 			err = fmt.Errorf(
 				"%s: setsid failed, reason -> %s", errLoc, err.Error(),
