@@ -41,7 +41,7 @@ var AppName = "daemon"
 var AppPath = "./" + filepath.Base(os.Args[0])
 
 // Absolute or relative path from working directory to PID file.
-var PidFile = "/tmp/daemon.pid"
+var PidFile = "/var/run/datahub.pid"
 
 // Pointer to PID file to keep file-lock alive.
 var pidFile *os.File

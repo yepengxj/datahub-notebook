@@ -3,8 +3,8 @@ package cmd
 import (
 	"bufio"
 	"bytes"
+	"crypto/md5"
 	"fmt"
-	"github.com/asiainfoLDP/datahub-client/cmd/dp"
 	"github.com/asiainfoLDP/datahub-client/utils"
 	"github.com/asiainfoLDP/datahub-client/utils/readline"
 	"io/ioutil"
@@ -31,14 +31,16 @@ type cmdMethod struct {
 type UserInfo struct {
 	userName string
 	password string
+	b64      string
 }
 
 var (
-	User     = UserInfo{}
-	Matches  = make([]string, 0, len(Cmds))
-	UnixSock = "/tmp/datahub.sock"
-	Running  = true
-	Logged   = false
+	User      = UserInfo{}
+	Matches   = make([]string, 0, len(Cmds))
+	UnixSock  = "/var/run/datahub.sock"
+	Running   = true
+	Logged    = false
+	CmdParser = make(map[string]func(string, []string) ([]byte, error))
 )
 
 var Cmds = []Commands{
@@ -188,7 +190,12 @@ func Login(interactive bool) {
 	//fmt.Printf("[%s]:[%s]\n", string(loginName), string(pass))
 
 	User.userName = string(loginName)
-	User.password = string(pass)
+	//User.password = string(pass)
+	User.password = fmt.Sprintf("%x", md5.Sum(pass))
+	/*
+		User.b64 = base64.StdEncoding.EncodeToString([]byte(User.password + ":" + User.password))
+		fmt.Printf("%s\n%s:%s\n", User.b64, User.userName, User.password)
+	*/
 	Logged = true
 }
 func commandLineArgsParser(args []string, path, method string) {
@@ -197,7 +204,7 @@ func commandLineArgsParser(args []string, path, method string) {
 	var jsonData []byte
 	var err error
 	//fmt.Println("command is:", command)
-	if f, ok := cmdParser[command]; ok {
+	if f, ok := CmdParser[command]; ok {
 		if jsonData, err = f(command, args[2:]); err != nil {
 			//fmt.Println(err.Error())
 			return
@@ -215,6 +222,9 @@ func commToDaemon(method, path string, jsonData []byte) {
 	//fmt.Println(method, path, string(jsonData))
 
 	req, err := http.NewRequest(strings.ToUpper(method), path, bytes.NewBuffer(jsonData))
+	if len(User.userName) > 0 {
+		req.SetBasicAuth(User.userName, User.password)
+	}
 	conn, err := net.Dial("unix", UnixSock)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -264,8 +274,14 @@ func CompletionEntry(prefix string, index int) string {
 	}
 }
 
-var cmdParser = make(map[string]func(string, []string) ([]byte, error))
-
 func CmdParserInit() {
-	cmdParser["dp create"] = dp.DpCreate
+
+	//cmdParser["dp create"] = dp.DpCreate
 }
+
+/*
+func AddBasicAuth(req *http.Request) *http.Request {
+	req.Header.Set("Authorization", "Basic "+User.b64)
+	return req
+}
+*/

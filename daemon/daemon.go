@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/asiainfoLDP/datahub-client/cmd"
 	"github.com/asiainfoLDP/datahub-client/daemon/daemonigo"
 	"io/ioutil"
 	"log"
@@ -137,8 +138,8 @@ func RunDaemon() {
 	}
 	fmt.Printf("server := http.Server{}\n")
 
-	os.Chdir("/tmp/datahub")
-	originalListener, err := net.Listen("unix", "/tmp/datahub.sock")
+	os.Chdir("/var/lib/datahub")
+	originalListener, err := net.Listen("unix", cmd.UnixSock)
 	if err != nil {
 		panic(err)
 	}

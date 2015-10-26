@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/asiainfoLDP/datahub-client/cmd"
+
 	"github.com/asiainfoLDP/datahub-client/utils/readline"
 	"os/exec"
 	"strings"
@@ -57,6 +58,7 @@ func RunClient() {
 		readline.AddHistory(*result) //allow user to recall this line
 	}
 }
+
 func ShowUsage() {
 	for _, v := range cmd.Cmds {
 		fmt.Printf("%-16s  %s\n", v.CmdName, v.CmdHelper)

@@ -3,6 +3,7 @@ package dp
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/asiainfoLDP/datahub-client/cmd"
 	"github.com/asiainfoLDP/datahub-client/utils/mflag"
 )
 
@@ -36,4 +37,8 @@ func DpCreate(cmd string, args []string) (j []byte, err error) {
 		return nil, fmt.Errorf("invalid argument")
 	}
 	return j, err
+}
+
+func init() {
+	cmd.CmdParser["dp create"] = DpCreate
 }
