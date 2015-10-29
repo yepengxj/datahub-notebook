@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
+	//"github.com/asiainfoLDP/datahub-client/ds"
 	"github.com/asiainfoLDP/datahub-client/utils"
 	"github.com/asiainfoLDP/datahub-client/utils/readline"
 	"io/ioutil"
@@ -33,11 +35,66 @@ type UserInfo struct {
 	password string
 	b64      string
 }
+type Data struct {
+	Item  DataItem
+	Usage DataItemUsage
+}
+
+type Repository struct {
+	Repository_id   int    `json:"repository_id,omitempty"`
+	Repository_name string `json:"repository_name,omitempty"`
+	User_id         int    `json:"user_id,omitempty"`
+	Permit_type     int    `json:"permit_type,omitempty"`
+	Arrange_type    int    `json:"arrange_type,omitempty"`
+	Comment         string `json:"comment,omitempty"`
+	Rank            int    `json:"rank,omitempty"`
+	Status          int    `json:"status,omitempty"`
+	Dataitems       int    `json:"dataitems,omitempty"`
+	Tags            int    `json:"tags,omitempty"`
+	Stars           int    `json:"stars,omitempty"`
+	Optime          string `json:"optime,omitempty"`
+}
+type DataItem struct {
+	Repository_id   int     `json:"repository_id,omitempty"`
+	User_id         int     `json:"user_id,omitempty"`
+	Dataitem_id     int     `json:"dataitem_id,omitempty"`
+	Dataitem_name   string  `json:"dataitem_name,omitempty"`
+	Ico_name        string  `json:"ico_name,omitempty"`
+	Permit_type     int     `json:"permit_type,omitempty"`
+	Key_words       string  `json:"key_words,omitempty"`
+	Supply_style    int     `json:"supply_style,omitempty"`
+	Priceunit_type  int     `json:"priceunit_type,omitempty"`
+	Price           float32 `json:"price,omitempty"`
+	Optime          string  `json:"optime,omitempty"`
+	Data_format     int     `json:"data_format,omitempty"`
+	Refresh_type    int     `json:"refresh_type,omitempty"`
+	Refresh_num     int     `json:"refresh_num,omitempty"`
+	Meta_filename   string  `json:"meta_filename,omitempty"`
+	Sample_filename string  `json:"sample_filename,omitempty"`
+	Comment         string  `json:"comment,omitempty"`
+}
+
+type DataItemUsage struct {
+	Dataitem_id   int    `json:"-,omitempty"`
+	Dataitem_name string `json:"-,omitempty"`
+	Views         int    `json:"views"`
+	Follows       int    `json:"follows"`
+	Downloads     int    `json:"downloads"`
+	Stars         int    `json:"stars"`
+	Refresh_date  string `json:"refresh_date,omitempty"`
+	Usability     int    `json:"usability,omitempty"`
+}
+
+type RepoJson struct {
+	Datas []Data
+	Total int
+}
 
 var (
 	User      = UserInfo{}
 	Matches   = make([]string, 0, len(Cmds))
 	UnixSock  = "/var/run/datahub.sock"
+	Prompt    = "datahub> "
 	Running   = true
 	Logged    = false
 	CmdParser = make(map[string]func(string, []string) ([]byte, error))
@@ -214,11 +271,11 @@ func commandLineArgsParser(args []string, path, method string) {
 		return
 	}
 
-	commToDaemon(method, path, jsonData)
+	commToDaemon(command, method, path, jsonData)
 
 }
 
-func commToDaemon(method, path string, jsonData []byte) {
+func commToDaemon(cmd, method, path string, jsonData []byte) {
 	//fmt.Println(method, path, string(jsonData))
 
 	req, err := http.NewRequest(strings.ToUpper(method), path, bytes.NewBuffer(jsonData))
@@ -236,8 +293,55 @@ func commToDaemon(method, path string, jsonData []byte) {
 	resp, err := client.Do(req)
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Printf(string(body))
+	formatResp(cmd, body)
 	//fmt.Printf(Prompt)
+}
+
+func formatResp(cmd string, body []byte) {
+	//fmt.Println(string(body))
+	switch cmd {
+	case "repo list":
+		var value = RepoJson{}
+		type Tag struct {
+			Repository     string `json:"-"`
+			dataitem       string `json:"-"`
+			dataitemusages string `json:"-"`
+			Tag            []struct {
+				a, b, c string
+			} `json:"tags"`
+		}
+		var value2 = Tag{}
+		v2Flag := false
+
+		fmt.Println(string(body))
+		if err := json.Unmarshal(body, &value); err != nil {
+			fmt.Println("111", err)
+			if err := json.Unmarshal(body, &value2); err != nil {
+
+				fmt.Println("222", err)
+			} else {
+				v2Flag = true
+			}
+
+		}
+
+		fmt.Println(value2)
+		if !v2Flag {
+			n, _ := fmt.Printf("\n%-8s%-24s%-16s\n", "ITEMID", "ITEMNAME", "LASTUPDATE")
+			printDash(n)
+			for _, v := range value.Datas {
+				fmt.Printf("%-8d%-24s%-s\n", v.Item.Dataitem_id, v.Item.Dataitem_name,
+					v.Usage.Refresh_date)
+				//fmt.Printf("%#v", v)
+			}
+			printDash(n)
+		} else {
+			fmt.Printf("hello world")
+		}
+	default:
+		fmt.Println(string(body))
+	}
+	flush()
 }
 
 func JobRequest(args []string, path, method string) {
@@ -274,6 +378,15 @@ func CompletionEntry(prefix string, index int) string {
 	}
 }
 
+func flush() {
+	fmt.Printf(Prompt)
+}
+func printDash(n int) {
+	for i := 0; i < n-2; i++ {
+		fmt.Printf("-")
+	}
+	fmt.Println()
+}
 func CmdParserInit() {
 
 	//cmdParser["dp create"] = dp.DpCreate

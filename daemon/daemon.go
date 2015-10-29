@@ -98,13 +98,11 @@ type msgResp struct {
 }
 
 func dpHttp(rw http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.Method)
 	r.ParseForm()
 	rw.WriteHeader(http.StatusOK)
 
 	if r.Method == "POST" {
 		result, _ := ioutil.ReadAll(r.Body)
-		fmt.Println(string(result))
 		reqJson := formatDpCreate{}
 		err := json.Unmarshal(result, &reqJson)
 		if err != nil {
@@ -172,6 +170,7 @@ func RunDaemon() {
 	http.HandleFunc("/", helloHttp)
 	http.HandleFunc("/stop", stopHttp)
 	http.HandleFunc("/datapool", dpHttp)
+	http.HandleFunc("/Repository", repoHandler)
 	//http.HandleFunc("/subscriptions", subHttp)
 
 	server := http.Server{}

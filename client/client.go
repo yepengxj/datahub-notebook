@@ -10,17 +10,13 @@ import (
 	"strings"
 )
 
-var (
-	Prompt = "datahub> "
-)
-
 func RunClient() {
 
 	fmt.Println("Welcome to datahub(v0.1.0)")
 	fmt.Println("Last login: Wed Oct 16 23:38:50 2015")
 
 	for cmd.Running == true {
-		result := readline.ReadLine(&Prompt)
+		result := readline.ReadLine(&cmd.Prompt)
 		if result == nil { // exit loop
 			break
 		}
