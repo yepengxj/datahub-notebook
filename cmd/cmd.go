@@ -146,14 +146,11 @@ var Cmds = []Commands{
 		CmdHelper: "EntryPoint management",
 	},
 	{
-		CmdName: "subscription",
+		CmdName: "mine",
 		path:    "/subscriptions",
 		subCmd: []cmdMethod{
-			{"queryall", "get"},
-			{"query", "get"},
+			{"info", "get"},
 			{"pull", "post"},
-			{"pullsingle", "post"},
-			{"stream", "post"},
 		},
 		Handler:   cmdHandler, //cmdHandlerSubscription,
 		CmdHelper: "Subscription management",
@@ -161,7 +158,7 @@ var Cmds = []Commands{
 	},
 	{
 		CmdName: "repo",
-		path:    "/Repository",
+		path:    "/repos",
 		subCmd: []cmdMethod{
 			{"list", "get"},
 			{"put", "post"},

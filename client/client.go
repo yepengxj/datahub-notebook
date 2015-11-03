@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/asiainfoLDP/datahub-client/cmd"
-
 	"github.com/asiainfoLDP/datahub-client/utils/readline"
 	"os/exec"
 	"strings"
