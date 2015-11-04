@@ -11,7 +11,6 @@ func Pull(login bool, args []string) (err error) {
 		fmt.Println("invalid argument..")
 		pullUsage()
 	}
-
 	return nil
 }
 
