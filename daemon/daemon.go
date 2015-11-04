@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"database/sql"
 	"github.com/asiainfoLDP/datahub-client/cmd"
 	"github.com/asiainfoLDP/datahub-client/daemon/daemonigo"
+	"github.com/asiainfoLDP/datahub-client/utils/httprouter"
+	"github.com/asiainfoLDP/datahub-client/ds"
 	"io/ioutil"
 	"log"
 	"net"
@@ -17,11 +20,39 @@ import (
 	"time"
 )
 
+var g_ds = new(ds.Ds)
+
+const g_dbfile string = "/var/run/datahub.db"
+
 const g_strDpPath string = "/var/lib/datahub/"
 
 type StoppableListener struct {
 	*net.UnixListener          //Wrapped listener
 	stop              chan int //Channel used only to indicate listener should shutdown
+}
+
+func init() {
+	//log.Println("connect to db sqlite3")
+	db, err := sql.Open("sqlite3", g_dbfile)
+	//defer db.Close()
+	chk(err)
+	g_ds.Db = db
+
+	g_ds.Create(ds.Create_dh_dp)
+	g_ds.Create(ds.Create_dh_dp_repo_ditem_map)
+	g_ds.Create(ds.Create_dh_repo_ditem_tag_map)
+
+}
+
+func chk(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+func get(err error) {
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func New(l net.Listener) (*StoppableListener, error) {
@@ -75,7 +106,7 @@ func (sl *StoppableListener) Stop() {
 	close(sl.stop)
 }
 
-func helloHttp(rw http.ResponseWriter, req *http.Request) {
+func helloHttp(rw http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	rw.WriteHeader(http.StatusOK)
 	fmt.Fprintf(rw, "Hello HTTP!\n")
 }
@@ -87,7 +118,7 @@ func stopHttp(rw http.ResponseWriter, req *http.Request) {
 	fmt.Println("connect close")
 }
 
-func dpHttp(rw http.ResponseWriter, r *http.Request) {
+func dpPostOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	r.ParseForm()
 	rw.WriteHeader(http.StatusOK)
 
@@ -107,6 +138,12 @@ func dpHttp(rw http.ResponseWriter, r *http.Request) {
 				msg.Msg = err.Error()
 			} else {
 				msg.Msg = "OK."
+				sql_dp_insert := fmt.Sprintf(`insert into DH_DP (DPID, DPNAME, DPTYPE, DPCONN, STATUS)
+					values (null, '%s', '%s', '%s', 'A')`, reqJson.Name, reqJson.Type, reqJson.Conn)
+			    if _,err := g_ds.Insert(sql_dp_insert); err != nil {
+			    	os.Remove(reqJson.Name)
+			    	msg.Msg = err.Error()
+			    }
 			}
 			resp, _ := json.Marshal(msg)
 			respStr := string(resp)
@@ -137,7 +174,7 @@ func RunDaemon() {
 	case err != nil:
 		log.Fatalf("main(): could not start daemon, reason -> %s", err.Error())
 	}
-	fmt.Printf("server := http.Server{}\n")
+	//fmt.Printf("server := http.Server{}\n")
 
 	if false == isDirExists(g_strDpPath) {
 		err := os.MkdirAll(g_strDpPath, 0755)
@@ -157,9 +194,18 @@ func RunDaemon() {
 		panic(err)
 	}
 
-	http.HandleFunc("/", helloHttp)
+    router := httprouter.New()
+	router.GET("/", helloHttp)
+	router.POST("/datapool", dpPostOneHandler)
+	//router.GET("/DataPools", dpGetAllHttpHandler)
+	//router.GET("/DataPools/:dpname", dpGetOneHttpHandler)
+	//router.DELETE("/DataPools/:dpname", dpDeleteOneHttpHandler)
+
+	http.Handle("/", router)
+
+	//http.HandleFunc("/", helloHttp)
 	http.HandleFunc("/stop", stopHttp)
-	http.HandleFunc("/datapool", dpHttp)
+	//http.HandleFunc("/datapool", dpHttp)
 	http.HandleFunc("/Repository", repoHandler)
 	//http.HandleFunc("/subscriptions", subHttp)
 

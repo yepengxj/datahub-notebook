@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"github.com/asiainfoLDP/datahub-client/utils/mflag"
 
 	"io/ioutil"
@@ -54,15 +55,15 @@ func DpCreate(needLogin bool, args []string) (err error) {
 		login(false)
 	}
 
-	commToDaemon("/datapool", jsonData)
+	commToDaemon("/datapool", "POST", jsonData)
 
 	return nil
 }
 
-func commToDaemon(path string, jsonData []byte) {
+func commToDaemon(path string, method string, jsonData []byte) {
 	//fmt.Println(method, path, string(jsonData))
 
-	req, err := http.NewRequest("POST", path, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest(strings.ToUpper(method), path, bytes.NewBuffer(jsonData))
 	if len(User.userName) > 0 {
 		req.SetBasicAuth(User.userName, User.password)
 	}
