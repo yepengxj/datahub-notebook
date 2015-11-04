@@ -87,33 +87,23 @@ func stopHttp(rw http.ResponseWriter, req *http.Request) {
 	fmt.Println("connect close")
 }
 
-type formatDpCreate struct {
-	Dpname  string `json:"dpname"`
-	Dptype  string `json:"dptype"`
-	Dpconn  string `json:"dpConn"`
-	Dpquota string `json:"dpquota"`
-}
-type msgResp struct {
-	Msg string `json:"msg"`
-}
-
 func dpHttp(rw http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	rw.WriteHeader(http.StatusOK)
 
 	if r.Method == "POST" {
 		result, _ := ioutil.ReadAll(r.Body)
-		reqJson := formatDpCreate{}
+		reqJson := cmd.FormatDpCreate{}
 		err := json.Unmarshal(result, &reqJson)
 		if err != nil {
 			fmt.Printf("%T\n%s\n%#v\n", err, err, err)
 			fmt.Println(rw, "invalid argument.")
 		}
-		if len(reqJson.Dpname) == 0 {
+		if len(reqJson.Name) == 0 {
 			fmt.Fprintln(rw, "invalid argument.")
 		} else {
-			msg := &msgResp{}
-			if err := os.Mkdir(reqJson.Dpname, 0755); err != nil {
+			msg := &cmd.MsgResp{}
+			if err := os.Mkdir(reqJson.Name, 0755); err != nil {
 				msg.Msg = err.Error()
 			} else {
 				msg.Msg = "OK."

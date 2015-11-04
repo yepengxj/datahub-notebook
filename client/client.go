@@ -1,62 +1,71 @@
 package client
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/asiainfoLDP/datahub-client/cmd"
-	"github.com/asiainfoLDP/datahub-client/utils/readline"
-	"os/exec"
+	"os"
 	"strings"
 )
 
 func RunClient() {
 
-	fmt.Println("Welcome to datahub(v0.1.0)")
-	fmt.Println("Last login: Wed Oct 16 23:38:50 2015")
-
-	for cmd.Running == true {
-		result := readline.ReadLine(&cmd.Prompt)
-		if result == nil { // exit loop
-			break
-		}
-
-		//lineSlice := strings.Split(*result, " ")
-		lineSlice := strings.Fields(*result)
-		if len(lineSlice) < 1 {
-			continue
-		}
-
-		commandFound := false
-		for _, v := range cmd.Cmds {
-			if strings.EqualFold(v.CmdName, lineSlice[0]) {
-				commandFound = true
-				v.Handler(lineSlice, v)
-			}
-
-		}
-
-		if !commandFound && len(lineSlice[0]) > 0 {
-			if lineSlice[0][0] == '!' {
-				cmd := exec.Command(strings.Trim(lineSlice[0], "!"), lineSlice[1:]...)
-				var out bytes.Buffer
-				cmd.Stdout = &out
-				cmd.Run()
-				fmt.Printf("%v", out.String())
-
-			} else if len(lineSlice[0]) == 1 && lineSlice[0][0] == '?' {
-				ShowUsage()
-			} else {
-				fmt.Println("no such command, type '?' to show help.")
-			}
-		}
-
-		readline.AddHistory(*result) //allow user to recall this line
+	if len(os.Args) < 2 {
+		ShowUsage()
+		os.Exit(2)
 	}
+
+	command := os.Args[1]
+
+	commandFound := false
+	for _, v := range cmd.Cmd {
+		if strings.EqualFold(v.Name, command) {
+			commandFound = true
+			if len(os.Args) > 2 && os.Args[2][0] != '-' {
+				subCmdFound := false
+				for _, vv := range v.SubCmd {
+					if strings.EqualFold(vv.Name, os.Args[2]) {
+						command += os.Args[2]
+						subCmdFound = true
+						vv.Handler(v.NeedLogin, os.Args[3:])
+					}
+				}
+				if !subCmdFound {
+					v.Handler(v.NeedLogin, os.Args[2:])
+				}
+			} else {
+				v.Handler(v.NeedLogin, os.Args[2:])
+			}
+		}
+	}
+	if !commandFound {
+		fmt.Println(command, "not found")
+	}
+	/*
+
+		if len(os.Args) > 2 && os.Args[2][0] != '-' {
+			command += os.Args[2]
+		}
+
+		cmdFound := false
+		for _, v := range cmd.Cmds {
+			if strings.EqualFold(v.CmdName, command) {
+				v.Handler(os.Args[1:], v)
+				cmdFound = true
+			}
+
+		}
+		if !cmdFound {
+			fmt.Println(os.Args[1], "not found.")
+			ShowUsage()
+		}
+	*/
+	return
+
 }
 
 func ShowUsage() {
-	for _, v := range cmd.Cmds {
-		fmt.Printf("%-16s  %s\n", v.CmdName, v.CmdHelper)
+	for _, v := range cmd.Cmd {
+		fmt.Printf("%-16s  %s\n", v.Name, v.Desc)
 
 	}
 }
