@@ -69,7 +69,7 @@ func commToDaemon(path string, jsonData []byte) {
 	conn, err := net.Dial("unix", UnixSock)
 	if err != nil {
 		fmt.Println(err.Error())
-		fmt.Println("Datahub Daemon not running?")
+		fmt.Println("Datahub Daemon not running? Or you are not root?")
 		return
 	}
 	//client := &http.Client{}
