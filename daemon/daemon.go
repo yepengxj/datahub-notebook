@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/asiainfoLDP/datahub-client/cmd"
-	"github.com/asiainfoLDP/datahub-client/daemon/daemonigo"
+	"github.com/asiainfoLDP/datahub/cmd"
+	"github.com/asiainfoLDP/datahub/daemon/daemonigo"
+	_ "github.com/julienschmidt/httprouter"
 	"io/ioutil"
 	"log"
 	"net"
@@ -77,7 +78,9 @@ func (sl *StoppableListener) Stop() {
 
 func helloHttp(rw http.ResponseWriter, req *http.Request) {
 	rw.WriteHeader(http.StatusOK)
-	fmt.Fprintf(rw, "Hello HTTP!\n")
+	body, _ := ioutil.ReadAll(req.Body)
+	fmt.Fprintf(rw, "%s Hello HTTP!\n", req.URL.Path)
+	fmt.Fprintf(rw, "%s \n", string(body))
 }
 
 func stopHttp(rw http.ResponseWriter, req *http.Request) {
@@ -89,6 +92,7 @@ func stopHttp(rw http.ResponseWriter, req *http.Request) {
 
 func dpHttp(rw http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
+
 	rw.WriteHeader(http.StatusOK)
 
 	if r.Method == "POST" {
@@ -161,7 +165,8 @@ func RunDaemon() {
 	http.HandleFunc("/stop", stopHttp)
 	http.HandleFunc("/datapool", dpHttp)
 	http.HandleFunc("/Repository", repoHandler)
-	//http.HandleFunc("/subscriptions", subHttp)
+	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/subscriptions", subsHandler)
 
 	server := http.Server{}
 

@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/asiainfoLDP/datahub-client/client"
-	"github.com/asiainfoLDP/datahub-client/daemon"
-	flag "github.com/asiainfoLDP/datahub-client/utils/mflag"
+	"github.com/asiainfoLDP/datahub/client"
+	"github.com/asiainfoLDP/datahub/daemon"
+	flag "github.com/asiainfoLDP/datahub/utils/mflag"
 	"os"
 )
 

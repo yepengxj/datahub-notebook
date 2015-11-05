@@ -3,6 +3,12 @@ package cmd
 import (
 	"fmt"
 	//"github.com/asiainfoLDP/datahub-client/ds"
+	"bytes"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"os"
+	"strings"
 )
 
 type Commands struct {
@@ -138,4 +144,32 @@ func login(interactive bool) {
 		return
 	}
 
+}
+
+func commToDaemon(method, path string, jsonData []byte) (resp *http.Response, err error) {
+	//fmt.Println(method, path, string(jsonData))
+
+	req, err := http.NewRequest(strings.ToUpper(method), path, bytes.NewBuffer(jsonData))
+	if len(User.userName) > 0 {
+		req.SetBasicAuth(User.userName, User.password)
+	} else {
+		req.Header.Set("Authorization", "Basic "+os.Getenv("DAEMON_USER_AUTH_INFO"))
+	}
+	conn, err := net.Dial("unix", UnixSock)
+	if err != nil {
+		fmt.Println(err.Error())
+		fmt.Println("Datahub Daemon not running? Or you are not root?")
+		os.Exit(2)
+	}
+	//client := &http.Client{}
+	client := httputil.NewClientConn(conn, nil)
+	return client.Do(req)
+	/*
+		defer resp.Body.Close()
+		response = *resp
+		body, _ := ioutil.ReadAll(resp.Body)
+		fmt.Println(string(body))
+
+		return
+	*/
 }

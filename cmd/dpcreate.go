@@ -1,15 +1,10 @@
 package cmd
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/asiainfoLDP/datahub-client/utils/mflag"
+	"github.com/asiainfoLDP/datahub/utils/mflag"
 	"io/ioutil"
-	"net"
-	"net/http"
-	"net/http/httputil"
-	"strings"
 )
 
 type FormatDpCreate struct {
@@ -54,29 +49,10 @@ func DpCreate(needLogin bool, args []string) (err error) {
 		login(false)
 	}
 
-	commToDaemon("post", "/datapool", jsonData)
-
-	return nil
-}
-
-func commToDaemon(method, path string, jsonData []byte) {
-	//fmt.Println(method, path, string(jsonData))
-
-	req, err := http.NewRequest(strings.ToUpper(method), path, bytes.NewBuffer(jsonData))
-	if len(User.userName) > 0 {
-		req.SetBasicAuth(User.userName, User.password)
-	}
-	conn, err := net.Dial("unix", UnixSock)
-	if err != nil {
-		fmt.Println(err.Error())
-		fmt.Println("Datahub Daemon not running? Or you are not root?")
-		return
-	}
-	//client := &http.Client{}
-	client := httputil.NewClientConn(conn, nil)
-	resp, err := client.Do(req)
+	resp, err := commToDaemon("post", "/datapool", jsonData)
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
-	//formatResp(cmd, body)
 	fmt.Println(string(body))
+
+	return nil
 }

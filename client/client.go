@@ -2,7 +2,7 @@ package client
 
 import (
 	"fmt"
-	"github.com/asiainfoLDP/datahub-client/cmd"
+	"github.com/asiainfoLDP/datahub/cmd"
 	"os"
 	"strings"
 )
@@ -39,6 +39,7 @@ func RunClient() {
 	}
 	if !commandFound {
 		fmt.Println(command, "not found")
+		ShowUsage()
 	}
 	/*
 

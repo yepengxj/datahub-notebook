@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -10,6 +11,12 @@ import (
 	"strconv"
 	"strings"
 )
+
+type DsPull struct {
+	Tag      string `json:"tag"`
+	Datapool string `json:"datapool"`
+	DestName string `json:"destname"`
+}
 
 func Pull(login bool, args []string) (err error) {
 
@@ -28,6 +35,8 @@ func Pull(login bool, args []string) (err error) {
 		source = u.Path[1:]
 	}
 
+	var repo, item string
+	ds := DsPull{}
 	if url := strings.Split(source, "/"); len(url) != 2 {
 		fmt.Println("invalid argument..")
 		pullUsage()
@@ -40,11 +49,26 @@ func Pull(login bool, args []string) (err error) {
 			target[1] = "latest"
 		}
 		uri = fmt.Sprintf("%s/%s:%s", url[0], target[0], target[1])
+		repo = url[0]
+		item = target[0]
+		ds.Tag = target[1]
+		ds.DestName = ds.Tag
+		ds.Datapool = args[1]
 	}
 
 	fmt.Println(uri)
 
-	return dl(uri)
+	jsonData, err := json.Marshal(ds)
+	if err != nil {
+		return
+	}
+
+	resp, err := commToDaemon("post", "/subscriptions/"+repo+"/"+item+"/pull", jsonData)
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(body))
+
+	return nil // dl(uri)
 	//return nil
 }
 
