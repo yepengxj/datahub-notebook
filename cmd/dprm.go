@@ -2,23 +2,26 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 )
 
 func DpRm(needLogin bool, args []string) (err error) {
-    var strdpname string
+	var strdpname string
 	if needLogin && !Logged {
 		login(false)
 	}
-    if len(args) > 0 && args[0][0] != '-' {
+	if len(args) > 0 && args[0][0] != '-' {
 		for _, v := range args {
-		    strdpname = v
-		    if v[0] != '-' {
-		        str_dpurl := fmt.Sprintf("/datapool/%s", strdpname)
+			strdpname = v
+			if v[0] != '-' {
+				str_dpurl := fmt.Sprintf("/datapools/%s", strdpname)
 
-		        ret_body := commToDaemon(str_dpurl, "DELETE", nil)
-	            fmt.Println(string(ret_body))
-		    }
-		}	
+				resp, _ := commToDaemon("DELETE", str_dpurl, nil)
+				defer resp.Body.Close()
+				body, _ := ioutil.ReadAll(resp.Body)
+				fmt.Println(string(body))
+			}
+		}
 	}
 	return nil
 }

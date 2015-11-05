@@ -3,7 +3,7 @@ package daemonigo
 
 import (
 	"fmt"
-	flag "github.com/asiainfoLDP/datahub-client/utils/mflag"
+	flag "github.com/asiainfoLDP/datahub/utils/mflag"
 	"io"
 	"os"
 	"os/exec"
