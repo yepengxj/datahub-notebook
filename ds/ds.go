@@ -26,6 +26,14 @@ type Data struct {
 	Item  DataItem
 	Usage DataItemUsage
 }
+type RepoJson struct {
+	Datas []Data
+	Total int
+}
+type MsgResp struct {
+	Msg string `json:"msg"`
+}
+
 
 type Repository struct {
 	Repository_id   int    `json:"repository_id,omitempty"`

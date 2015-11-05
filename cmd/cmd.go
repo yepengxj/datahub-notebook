@@ -1,89 +1,21 @@
 package cmd
 
 import (
-	"fmt"
-	"strings"
 	"bytes"
+	"fmt"
+	//"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httputil"
-	"io/ioutil"
+	"os"
+	"strings"
 	//"github.com/asiainfoLDP/datahub-client/ds"
 )
-
-type Commands struct {
-	CmdName   string
-	subCmd    []cmdMethod
-	path      string
-	Handler   func([]string, Commands)
-	CmdHelper string
-	needLogin bool
-}
-type cmdMethod struct {
-	cmd    string
-	method string
-}
 
 type UserInfo struct {
 	userName string
 	password string
 	b64      string
-}
-type Data struct {
-	Item  DataItem
-	Usage DataItemUsage
-}
-type MsgResp struct {
-	Msg string `json:"msg"`
-}
-type Repository struct {
-	Repository_id   int    `json:"repository_id,omitempty"`
-	Repository_name string `json:"repository_name,omitempty"`
-	User_id         int    `json:"user_id,omitempty"`
-	Permit_type     int    `json:"permit_type,omitempty"`
-	Arrange_type    int    `json:"arrange_type,omitempty"`
-	Comment         string `json:"comment,omitempty"`
-	Rank            int    `json:"rank,omitempty"`
-	Status          int    `json:"status,omitempty"`
-	Dataitems       int    `json:"dataitems,omitempty"`
-	Tags            int    `json:"tags,omitempty"`
-	Stars           int    `json:"stars,omitempty"`
-	Optime          string `json:"optime,omitempty"`
-}
-type DataItem struct {
-	Repository_id   int     `json:"repository_id,omitempty"`
-	User_id         int     `json:"user_id,omitempty"`
-	Dataitem_id     int     `json:"dataitem_id,omitempty"`
-	Dataitem_name   string  `json:"dataitem_name,omitempty"`
-	Ico_name        string  `json:"ico_name,omitempty"`
-	Permit_type     int     `json:"permit_type,omitempty"`
-	Key_words       string  `json:"key_words,omitempty"`
-	Supply_style    int     `json:"supply_style,omitempty"`
-	Priceunit_type  int     `json:"priceunit_type,omitempty"`
-	Price           float32 `json:"price,omitempty"`
-	Optime          string  `json:"optime,omitempty"`
-	Data_format     int     `json:"data_format,omitempty"`
-	Refresh_type    int     `json:"refresh_type,omitempty"`
-	Refresh_num     int     `json:"refresh_num,omitempty"`
-	Meta_filename   string  `json:"meta_filename,omitempty"`
-	Sample_filename string  `json:"sample_filename,omitempty"`
-	Comment         string  `json:"comment,omitempty"`
-}
-
-type DataItemUsage struct {
-	Dataitem_id   int    `json:"-,omitempty"`
-	Dataitem_name string `json:"-,omitempty"`
-	Views         int    `json:"views"`
-	Follows       int    `json:"follows"`
-	Downloads     int    `json:"downloads"`
-	Stars         int    `json:"stars"`
-	Refresh_date  string `json:"refresh_date,omitempty"`
-	Usability     int    `json:"usability,omitempty"`
-}
-
-type RepoJson struct {
-	Datas []Data
-	Total int
 }
 
 var (
@@ -115,7 +47,7 @@ var Cmd = []Command{
 				Handler: DpRm,
 			},
 		},
-		Desc: "list all of datapool.",
+		Desc: "list all of datapools.",
 	},
 	{
 		Name:      "subs",
@@ -146,26 +78,28 @@ func login(interactive bool) {
 
 }
 
-func commToDaemon(path string, method string, jsonData []byte) (body []byte) {
+func commToDaemon(method, path string, jsonData []byte) (resp *http.Response, err error) {
 	fmt.Println(method, path, string(jsonData))
 
 	req, err := http.NewRequest(strings.ToUpper(method), path, bytes.NewBuffer(jsonData))
 	if len(User.userName) > 0 {
 		req.SetBasicAuth(User.userName, User.password)
+	} else {
+		req.Header.Set("Authorization", "Basic "+os.Getenv("DAEMON_USER_AUTH_INFO"))
 	}
 	conn, err := net.Dial("unix", UnixSock)
 	if err != nil {
 		fmt.Println(err.Error())
 		fmt.Println("Datahub Daemon not running? Or you are not root?")
-		return nil
+		os.Exit(2)
 	}
 	//client := &http.Client{}
 	client := httputil.NewClientConn(conn, nil)
-	resp, err := client.Do(req)
-	defer resp.Body.Close()
-	body, _ = ioutil.ReadAll(resp.Body)
-	//formatResp(cmd, body)
-	//fmt.Println(string(body))
-	return body
+	return client.Do(req)
+	/*
+		defer resp.Body.Close()
+		response = *resp
+		body, _ := ioutil.ReadAll(resp.Body)
+		fmt.Println(string(body))
+	*/
 }
-

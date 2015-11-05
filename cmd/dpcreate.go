@@ -3,7 +3,8 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/asiainfoLDP/datahub-client/utils/mflag"
+	"github.com/asiainfoLDP/datahub/utils/mflag"
+	"io/ioutil"
 )
 
 type FormatDpCreate struct {
@@ -48,8 +49,10 @@ func DpCreate(needLogin bool, args []string) (err error) {
 		login(false)
 	}
 
-	ret_body := commToDaemon("/datapool", "POST", jsonData)
-	fmt.Println(string(ret_body))
+	resp, err := commToDaemon("POST", "/datapools", jsonData)
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(body))
 
 	return nil
 }
