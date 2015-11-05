@@ -100,7 +100,7 @@ const Create_dh_dp_repo_ditem_map string = `CREATE TABLE IF NOT EXISTS
         DATAITEM     VARCHAR(128), 
         DPID         INTEGER, 
         PUBLISH      CHAR(2), 
-        CREATE_DATE  DATE 
+        CREATE_TIME  DATETIME 
     );`
 
 //DH_DP_REPO_DITEM_MAP  PUBLISH: 'Y' the dataitem is published by you,
@@ -109,7 +109,8 @@ const Create_dh_dp_repo_ditem_map string = `CREATE TABLE IF NOT EXISTS
 const Create_dh_repo_ditem_tag_map string = `CREATE TABLE IF NOT EXISTS 
     DH_RPDM_TAG_MAP ( 
         TAGNAME      VARCHAR(128), 
-        RPDMID       INTEGER 
+        RPDMID       INTEGER,
+        CREATE_TIME  DATETIME
     );`
 
 type Executer interface {

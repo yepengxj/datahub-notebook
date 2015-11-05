@@ -1,22 +1,15 @@
 package cmd
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"strings"
 	"github.com/asiainfoLDP/datahub-client/utils/mflag"
-
-	"io/ioutil"
-	"net"
-	"net/http"
-	"net/http/httputil"
 )
 
 type FormatDpCreate struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-	Conn string `json:"conn"`
+	Name string `json:"dpname"`
+	Type string `json:"dptype"`
+	Conn string `json:"dpconn"`
 }
 
 func DpCreate(needLogin bool, args []string) (err error) {
@@ -55,29 +48,8 @@ func DpCreate(needLogin bool, args []string) (err error) {
 		login(false)
 	}
 
-	commToDaemon("/datapool", "POST", jsonData)
+	ret_body := commToDaemon("/datapool", "POST", jsonData)
+	fmt.Println(string(ret_body))
 
 	return nil
-}
-
-func commToDaemon(path string, method string, jsonData []byte) {
-	//fmt.Println(method, path, string(jsonData))
-
-	req, err := http.NewRequest(strings.ToUpper(method), path, bytes.NewBuffer(jsonData))
-	if len(User.userName) > 0 {
-		req.SetBasicAuth(User.userName, User.password)
-	}
-	conn, err := net.Dial("unix", UnixSock)
-	if err != nil {
-		fmt.Println(err.Error())
-		fmt.Println("Datahub Daemon not running? Or you are not root?")
-		return
-	}
-	//client := &http.Client{}
-	client := httputil.NewClientConn(conn, nil)
-	resp, err := client.Do(req)
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	//formatResp(cmd, body)
-	fmt.Println(string(body))
 }

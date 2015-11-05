@@ -2,6 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
+	"bytes"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"io/ioutil"
 	//"github.com/asiainfoLDP/datahub-client/ds"
 )
 
@@ -139,3 +145,27 @@ func login(interactive bool) {
 	}
 
 }
+
+func commToDaemon(path string, method string, jsonData []byte) (body []byte) {
+	fmt.Println(method, path, string(jsonData))
+
+	req, err := http.NewRequest(strings.ToUpper(method), path, bytes.NewBuffer(jsonData))
+	if len(User.userName) > 0 {
+		req.SetBasicAuth(User.userName, User.password)
+	}
+	conn, err := net.Dial("unix", UnixSock)
+	if err != nil {
+		fmt.Println(err.Error())
+		fmt.Println("Datahub Daemon not running? Or you are not root?")
+		return nil
+	}
+	//client := &http.Client{}
+	client := httputil.NewClientConn(conn, nil)
+	resp, err := client.Do(req)
+	defer resp.Body.Close()
+	body, _ = ioutil.ReadAll(resp.Body)
+	//formatResp(cmd, body)
+	//fmt.Println(string(body))
+	return body
+}
+
