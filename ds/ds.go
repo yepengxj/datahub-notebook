@@ -11,6 +11,12 @@ type FormatRepoList struct {
 	ItemID   string `json:"itemID"`
 }
 
+type DsPull struct {
+	Tag      string `json:"tag"`
+	Datapool string `json:"datapool"`
+	DestName string `json:"destname"`
+}
+
 const (
 	DB_DML_INSERT = "insert"
 	DB_DML_DELETE = "delete"
@@ -22,70 +28,63 @@ const (
 	TABLE_USER    = "user"
 )
 
-type Data struct {
-	Item  DataItem
-	Usage DataItemUsage
-}
-type RepoJson struct {
-	Datas []Data
-	Total int
-}
 type MsgResp struct {
 	Msg string `json:"msg"`
 }
 
-
-type Repository struct {
-	Repository_id   int    `json:"repository_id,omitempty"`
-	Repository_name string `json:"repository_name,omitempty"`
-	User_id         int    `json:"user_id,omitempty"`
-	Permit_type     int    `json:"permit_type,omitempty"`
-	Arrange_type    int    `json:"arrange_type,omitempty"`
-	Comment         string `json:"comment,omitempty"`
-	Rank            int    `json:"rank,omitempty"`
-	Status          int    `json:"status,omitempty"`
-	Dataitems       int    `json:"dataitems,omitempty"`
-	Tags            int    `json:"tags,omitempty"`
-	Stars           int    `json:"stars,omitempty"`
-	Optime          string `json:"optime,omitempty"`
-}
 type DataItem struct {
-	Repository_id   int     `json:"repository_id,omitempty"`
-	User_id         int     `json:"user_id,omitempty"`
-	Dataitem_id     int     `json:"dataitem_id,omitempty"`
-	Dataitem_name   string  `json:"dataitem_name,omitempty"`
-	Ico_name        string  `json:"ico_name,omitempty"`
-	Permit_type     int     `json:"permit_type,omitempty"`
-	Key_words       string  `json:"key_words,omitempty"`
-	Supply_style    int     `json:"supply_style,omitempty"`
-	Priceunit_type  int     `json:"priceunit_type,omitempty"`
-	Price           float32 `json:"price,omitempty"`
-	Optime          string  `json:"optime,omitempty"`
-	Data_format     int     `json:"data_format,omitempty"`
-	Refresh_type    int     `json:"refresh_type,omitempty"`
-	Refresh_num     int     `json:"refresh_num,omitempty"`
-	Meta_filename   string  `json:"meta_filename,omitempty"`
-	Sample_filename string  `json:"sample_filename,omitempty"`
-	Comment         string  `json:"comment,omitempty"`
+	Repository_name string `json:"repname,omitempty"`
+	Dataitem_name   string `json:"dataitem_name,omitempty"`
+	/*
+		User_id         int     `json:"user_id,omitempty"`
+		Dataitem_id     int64   `json:"dataitem_id,omitempty"  xorm:"dataitem_id pk autoincr"`
+		Ico_name        string  `json:"ico_name,omitempty"`
+		Permit_type     int     `json:"permit_type,omitempty"`
+		Key_words       string  `json:"key_words,omitempty"`
+		Supply_style    int     `json:"supply_style,omitempty"`
+		Priceunit_type  int     `json:"priceunit_type,omitempty"`
+		Price           float32 `json:"price,omitempty"`
+		Optime          string  `json:"optime,omitempty"`
+		Data_format     int     `json:"data_format,omitempty"`
+		Refresh_type    string  `json:"refresh_type,omitempty"`
+		Refresh_num     int     `json:"refresh_num,omitempty"`
+		Meta_filename   string  `json:"meta_filename,omitempty"`
+		Sample_filename string  `json:"sample_filename,omitempty"`
+		Comment         string  `json:"comment,omitempty"`
+	*/
 }
 
 type DataItemUsage struct {
-	Dataitem_id   int    `json:"-,omitempty"`
-	Dataitem_name string `json:"-,omitempty"`
+	Dataitem_id   int64  `json:"dataitem_id,omitempty"  xorm:"dataitem_id pk autoincr"`
+	Dataitem_name string `json:"dataitem_name,omitempty"`
 	Views         int    `json:"views"`
 	Follows       int    `json:"follows"`
-	Downloads     int    `json:"downloads"`
-	Stars         int    `json:"stars"`
-	Refresh_date  string `json:"refresh_date,omitempty"`
-	Usability     int    `json:"usability,omitempty"`
+	//	Downloads     int    `json:"downloads"`
+	Stars        int    `json:"stars"`
+	Refresh_date string `json:"refresh_date,omitempty"`
+	Usability    int    `json:"usability,omitempty"`
 }
 
-type UpLoadLog struct {
-	Tag      string `json:"tag,omitempty"`
-	Filename string `json:"filename,omitempty"`
-	Optime   string `json:"optime,omitempty"`
+type Tag struct {
+	Dataitem_id int64  `json:"dataitem_id,omitempty"`
+	Tag         string `json:"tag,omitempty"`
+	Filename    string `json:"filename,omitempty"`
+	Optime      string `json:"optime,omitempty"`
 }
 
+type Data struct {
+	Item *DataItem `json:"item,omitempty"`
+	//Usage *DataItemUsage `json:"statis,omitempty"`
+	Tags []Tag `json:"tags,omitempty"`
+}
+
+/*
+type ItemDetail struct {
+	Item  *DataItem      `json:"item,omitempty"`
+	Usage *DataItemUsage `json:"statis,omitempty"`
+	Tags  []Tag          `json:"tags,omitempty"`
+}
+*/
 type Ds struct {
 	Db *sql.DB
 }
