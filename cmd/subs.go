@@ -9,6 +9,7 @@ import (
 )
 
 func Subs(login bool, args []string) (err error) {
+
 	itemDetail := false
 	if len(args) > 1 {
 		fmt.Println("invalid argument..")
