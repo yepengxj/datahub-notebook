@@ -388,10 +388,7 @@ func RunDaemon() {
 	router.DELETE("/datapools/:dpname", dpDeleteOneHandler)
 
 	http.Handle("/", router)
-
-	//http.HandleFunc("/", helloHttp)
 	http.HandleFunc("/stop", stopHttp)
-	//http.HandleFunc("/datapool", dpHttp)
 	http.HandleFunc("/Repository", repoHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/subscriptions", subsHandler)
@@ -407,6 +404,16 @@ func RunDaemon() {
 		server.Serve(sl)
 	}()
 
+	//p2p server
+	router_p2p := httprouter.New()
+	router_p2p.GET("/", sayhello)
+	router_p2p.GET("/pull", p2p_pull)
+	go func() {
+		wg.Add(1)
+		defer wg.Done()
+		http.ListenAndServe(":35800", router_p2p)
+	}()
+
 	fmt.Printf("Serving HTTP\n")
 	select {
 	case signal := <-stop:
@@ -419,4 +426,20 @@ func RunDaemon() {
 	daemonigo.UnlockPidFile()
 	g_ds.Db.Close()
 
+}
+
+/*pull parses filename and target IP from HTTP GET method, and start downloading routine. */
+func p2p_pull(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	fmt.Println("p2p pull...")
+	r.ParseForm()
+	file := r.Form.Get("file")
+	http.ServeFile(w, r, "pull/"+file)
+
+}
+
+func sayhello(rw http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+	rw.WriteHeader(http.StatusOK)
+	body, _ := ioutil.ReadAll(req.Body)
+	fmt.Fprintf(rw, "%s Hello HTTP p2p!\n", req.URL.Path)
+	fmt.Fprintf(rw, "%s \n", string(body))
 }
