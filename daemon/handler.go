@@ -1,6 +1,7 @@
 package daemon
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/asiainfoLDP/datahub/ds"
@@ -9,16 +10,13 @@ import (
 )
 
 var (
-	loginLogged  = false
-	loginAuthStr string
+	loginLogged   = false
+	loginAuthStr  string
+	DefatulServer = "http://10.1.235.96:8080"
 )
 
-func subsHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, r.URL.Path)
-
-}
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	url := "http://10.1.51.32:8080/subscriptions/login"
+	url := DefatulServer + "/subscriptions/login"
 	r.ParseForm()
 
 	if _, ok := r.Header["Authorization"]; !ok {
@@ -97,4 +95,23 @@ func repoHandler(rw http.ResponseWriter, req *http.Request) {
 	//fmt.Println("response Body:", string(body))
 	fmt.Fprintln(rw, string(body))
 
+}
+
+func commToServer(method, path string, buffer []byte, w http.ResponseWriter) (resp *http.Response, err error) {
+
+	req, err := http.NewRequest(method, DefatulServer+path, bytes.NewBuffer(buffer))
+	if len(loginAuthStr) > 0 {
+		req.Header.Set("Authorization", loginAuthStr)
+	}
+
+	if resp, err = http.DefaultClient.Do(req); err != nil {
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+	defer resp.Body.Close()
+
+	w.WriteHeader(resp.StatusCode)
+	body, _ := ioutil.ReadAll(resp.Body)
+	w.Write(body)
+	return
 }

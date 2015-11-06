@@ -103,3 +103,9 @@ func commToDaemon(method, path string, jsonData []byte) (resp *http.Response, er
 		fmt.Println(string(body))
 	*/
 }
+func printDash(n int) {
+	for i := 0; i < n-2; i++ {
+		fmt.Printf("-")
+	}
+	fmt.Println()
+}
