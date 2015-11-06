@@ -108,8 +108,9 @@ const Create_dh_dp_repo_ditem_map string = `CREATE TABLE IF NOT EXISTS
 
 const Create_dh_repo_ditem_tag_map string = `CREATE TABLE IF NOT EXISTS 
     DH_RPDM_TAG_MAP ( 
-        TAGNAME      VARCHAR(128), 
+        TAGNAME      VARCHAR(128),
         RPDMID       INTEGER,
+        DETAIL       VARCHAR(128),
         CREATE_TIME  DATETIME
     );`
 

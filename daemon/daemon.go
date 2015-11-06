@@ -175,7 +175,6 @@ func dpGetAllHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Para
 	}
 
 	msg := &cmd.MsgResp{}
-
 	msg.Msg = "OK."
 	wrtocli := cmd.FormatDp{}
 	sql_dp := fmt.Sprintf(`SELECT DPNAME, DPTYPE FROM DH_DP WHERE STATUS = 'A'`)
@@ -348,6 +347,14 @@ func isDirExists(path string) bool {
 	}
 	panic("not reached")
 }
+func isFileExists(file string) bool {
+	fi, err := os.Stat(file)
+	if err == nil {
+		fmt.Println("exist", file)
+		return !fi.IsDir()
+	}
+	return os.IsExist(err)
+}
 
 func RunDaemon() {
 	fmt.Println("run daemon..")
@@ -407,7 +414,7 @@ func RunDaemon() {
 	//p2p server
 	router_p2p := httprouter.New()
 	router_p2p.GET("/", sayhello)
-	router_p2p.GET("/pull", p2p_pull)
+	router_p2p.GET("/pull/:repo/:dataitem/:tag", p2p_pull)
 	go func() {
 		wg.Add(1)
 		defer wg.Done()
@@ -429,12 +436,69 @@ func RunDaemon() {
 }
 
 /*pull parses filename and target IP from HTTP GET method, and start downloading routine. */
-func p2p_pull(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	fmt.Println("p2p pull...")
 	r.ParseForm()
-	file := r.Form.Get("file")
-	http.ServeFile(w, r, "pull/"+file)
+	//file := r.Form.Get("file")
+	sRepoName := ps.ByName("repo")
+	sDataItem := ps.ByName("dataitem")
+	sTag := ps.ByName("tag")
+	fmt.Println(sRepoName, sDataItem, sTag)
+	var irpdmid, idpid int
+	var stagdetail, sdpconn string
+	msg := &cmd.MsgResp{}
+	msg.Msg = "OK."
 
+	sql_get_rpdmid_dpid := fmt.Sprintf(`SELECT DPID, RPDMID FROM DH_DP_RPDM_MAP 
+    	WHERE REPOSITORY = '%s' AND DATAITEM = '%s'`, sRepoName, sDataItem)
+	row, err := g_ds.QueryRow(sql_get_rpdmid_dpid)
+	if err != nil {
+		msg.Msg = err.Error()
+	}
+	row.Scan(&idpid, &irpdmid)
+	fmt.Println("dpid", idpid, "rpdmid", irpdmid)
+
+	sql_get_tag_detail := fmt.Sprintf(`SELECT DETAIL FROM DH_RPDM_TAG_MAP 
+        WHERE RPDMID = '%d' AND TAGNAME = '%s'`, irpdmid, sTag)
+	tagrow, err := g_ds.QueryRow(sql_get_tag_detail)
+	if err != nil {
+		msg.Msg = err.Error()
+	}
+	tagrow.Scan(&stagdetail)
+	fmt.Println("tagdetail", stagdetail)
+
+	sql_get_dpconn := fmt.Sprintf(`SELECT DPCONN FROM DH_DP WHERE DPID='%d'`, idpid)
+	dprow, err := g_ds.QueryRow(sql_get_dpconn)
+	if err != nil {
+		msg.Msg = err.Error()
+	}
+	dprow.Scan(&sdpconn)
+	fmt.Println("dpconn", sdpconn)
+
+	filepathname := "/" + sdpconn + "/" + sRepoName + "/" + sDataItem + "/" + stagdetail
+	fmt.Println("475, filename:", filepathname)
+	if exists := isFileExists(filepathname); !exists {
+		filepathname = "/" + sdpconn + "/" + stagdetail
+		if exists := isFileExists(filepathname); !exists {
+			filepathname = "/var/lib/datahub/" + sTag
+			if exists := isFileExists(filepathname); !exists {
+				fmt.Println("479, filename:", filepathname)
+				//http.NotFound(rw, r)
+				msg.Msg = "tag not found"
+				resp, _ := json.Marshal(msg)
+				respStr := string(resp)
+				fmt.Fprintln(rw, respStr)
+				return
+			}
+		}
+	}
+	//rw.Header().Set("Content-Type", "file")
+	http.ServeFile(rw, r, filepathname)
+
+	resp, _ := json.Marshal(msg)
+	respStr := string(resp)
+	fmt.Fprintln(rw, respStr)
+	return
 }
 
 func sayhello(rw http.ResponseWriter, req *http.Request, ps httprouter.Params) {
