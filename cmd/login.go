@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"github.com/asiainfoLDP/datahub/utils"
 	"io/ioutil"
@@ -40,5 +41,9 @@ func Login(login bool, args []string) (err error) {
 	}
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println(resp.StatusCode, string(body))
-	return nil
+	if resp.StatusCode == 401 {
+		return errors.New(string(body))
+	}
+	return err
+
 }
