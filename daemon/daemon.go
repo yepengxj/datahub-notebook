@@ -22,7 +22,7 @@ import (
 
 var g_ds = new(ds.Ds)
 
-const g_dbfile string = "/var/run/datahub.db"
+const g_dbfile string = "/var/lib/datahub/datahub.db"
 
 const g_strDpPath string = "/var/lib/datahub/"
 
@@ -157,6 +157,11 @@ func RunDaemon() {
 
 	dbinit()
 
+	bUnixSockExist := isFileExists(cmd.UnixSock)
+	if bUnixSockExist {
+		os.Remove(cmd.UnixSock)
+	}
+
 	if false == isDirExists(g_strDpPath) {
 		err := os.MkdirAll(g_strDpPath, 0755)
 		if err != nil {
@@ -270,21 +275,25 @@ func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	filepathname := "/" + sdpconn + "/" + sdpname + "/" + sRepoName + "/" + sDataItem + "/" + stagdetail
 	fmt.Println(" filename:", filepathname)
 	if exists := isFileExists(filepathname); !exists {
-		filepathname = "/" + sdpconn + "/" + stagdetail
+		filepathname = "/" + sdpconn + "/" + sdpname + "/" + sRepoName + "/" + sDataItem + "/" + sTag
 		if exists := isFileExists(filepathname); !exists {
-			filepathname = "/var/lib/datahub/" + sTag
+			filepathname = "/" + sdpconn + "/" + stagdetail
 			if exists := isFileExists(filepathname); !exists {
-				fmt.Println(" filename:", filepathname)
-				//http.NotFound(rw, r)
-				msg.Msg = "tag not found"
-				resp, _ := json.Marshal(msg)
-				respStr := string(resp)
-				rw.WriteHeader(http.StatusNotFound)
-				fmt.Fprintln(rw, respStr)
-				return
+				filepathname = "/var/lib/datahub/" + sTag
+				if exists := isFileExists(filepathname); !exists {
+					fmt.Println(" filename:", filepathname)
+					//http.NotFound(rw, r)
+					msg.Msg = "tag not found"
+					resp, _ := json.Marshal(msg)
+					respStr := string(resp)
+					rw.WriteHeader(http.StatusNotFound)
+					fmt.Fprintln(rw, respStr)
+					return
+				}
 			}
 		}
 	}
+
 	rw.Header().Set("Source-FileName", stagdetail)
 	http.ServeFile(rw, r, filepathname)
 

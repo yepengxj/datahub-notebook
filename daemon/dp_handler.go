@@ -28,14 +28,27 @@ func dpPostOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Par
 			fmt.Fprintln(rw, "invalid argument.")
 		} else {
 			msg := &ds.MsgResp{}
-			if err := os.Mkdir(reqJson.Name, 0755); err != nil {
+			var sdpDirName string
+			if len(reqJson.Conn) == 0 {
+				reqJson.Conn = g_strDpPath
+				sdpDirName = g_strDpPath + reqJson.Name
+
+			} else if reqJson.Conn[0] != '/' {
+				sdpDirName = g_strDpPath + reqJson.Conn
+				reqJson.Conn = sdpDirName
+				sdpDirName = sdpDirName + "/" + reqJson.Name
+			} else {
+				sdpDirName = reqJson.Conn + "/" + reqJson.Name
+			}
+
+			if err := os.MkdirAll(sdpDirName, 0755); err != nil {
 				msg.Msg = err.Error()
 			} else {
-				msg.Msg = "OK."
+				msg.Msg = fmt.Sprintf("OK. dp:%s total path:%s", reqJson.Name, sdpDirName)
 				sql_dp_insert := fmt.Sprintf(`insert into DH_DP (DPID, DPNAME, DPTYPE, DPCONN, STATUS)
 					values (null, '%s', '%s', '%s', 'A')`, reqJson.Name, reqJson.Type, reqJson.Conn)
 				if _, err := g_ds.Insert(sql_dp_insert); err != nil {
-					os.Remove(reqJson.Name)
+					os.Remove(sdpDirName)
 					msg.Msg = err.Error()
 				}
 			}
