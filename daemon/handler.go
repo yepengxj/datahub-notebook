@@ -12,7 +12,7 @@ import (
 var (
 	loginLogged   = false
 	loginAuthStr  string
-	DefatulServer = "http://10.1.235.96:8080"
+	DefatulServer = "http://dogfood.hub.dataos.io"
 )
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
