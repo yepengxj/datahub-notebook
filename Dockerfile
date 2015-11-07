@@ -17,7 +17,7 @@ FROM golang:1.5.1
 
 RUN mkdir /go/src/datahub -p
 WORKDIR /go/src/datahub/
-ADD . /go/src/datahub/
+COPY . /go/src/datahub/
 FROM golang:1.5
 
 MAINTAINER Zonesan <chaizs@asiainfo.com>
