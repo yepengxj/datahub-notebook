@@ -30,7 +30,6 @@ MAINTAINER Zonesan <chaizs@asiainfo.com>
 #    mv daemon /bin
 
 RUN go get github.com/tools/godep
-RUN cd /go/src/datahub/
 RUN $GOPATH/bin/godep restore
 RUN $GOPATH/bin/godep go install
 
