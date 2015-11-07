@@ -1,4 +1,5 @@
 # This is a local-build docker image for p2p-dl test
+
 #FROM golang:1.5
 #MAINTAINER Zonesan <chaizs@asiainfo.com>
 #EXPOSE 35800
@@ -19,7 +20,6 @@ ADD . /go/src/datahub/
 FROM golang:1.5
 
 MAINTAINER Zonesan <chaizs@asiainfo.com>
-EXPOSE 35800
 #ENV GOPATH /home/go
 #WORKDIR $GOPATH/src/github.com/asiainfoLDP/datahub
 #ADD . $GOPATH/src/github.com/asiainfoLDP/datahub
@@ -29,8 +29,8 @@ EXPOSE 35800
 #    mv daemon /bin
 
 RUN go get github.com/tools/godep
-RUN godep restore
-RUN godep go install
+RUN $GOPATH/bin/godep restore
+RUN $GOPATH/bin/godep go install
 
 
 EXPOSE 35800
