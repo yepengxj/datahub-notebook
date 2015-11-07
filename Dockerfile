@@ -4,7 +4,7 @@ FROM golang:1.5
 MAINTAINER Zonesan <chaizs@asiainfo.com>
 
 ENV SRCPATH $GOPATH/src/github.com/asiainfoLDP/datahub 
-RUN mkdir $SRCPATH
+RUN mkdir $SRCPATH -p
 WORKDIR $SRCPATH
 
 ADD . $SRCPATH
