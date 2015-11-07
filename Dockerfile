@@ -15,7 +15,8 @@
 
 FROM golang:1.5.1
 
-WORKDIR /go/src/datahub
+RUN mkdir /go/src/datahub -p
+WORKDIR /go/src/datahub/
 ADD . /go/src/datahub/
 FROM golang:1.5
 
