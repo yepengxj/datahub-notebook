@@ -157,11 +157,6 @@ func RunDaemon() {
 
 	dbinit()
 
-	bUnixSockExist := isFileExists(cmd.UnixSock)
-	if bUnixSockExist {
-		os.Remove(cmd.UnixSock)
-	}
-
 	if false == isDirExists(g_strDpPath) {
 		err := os.MkdirAll(g_strDpPath, 0755)
 		if err != nil {
