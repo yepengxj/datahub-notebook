@@ -30,8 +30,8 @@ func dpPostOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Par
 			msg := &ds.MsgResp{}
 			var sdpDirName string
 			if len(reqJson.Conn) == 0 {
+				reqJson.Conn = g_strDpPath
 				sdpDirName = g_strDpPath + reqJson.Name
-				reqJson.Conn = sdpDirName
 
 			} else if reqJson.Conn[0] != '/' {
 				sdpDirName = g_strDpPath + reqJson.Conn
