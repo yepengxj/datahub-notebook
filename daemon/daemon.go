@@ -269,21 +269,24 @@ func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	filepathname := "/" + sdpconn + "/" + sdpname + "/" + sRepoName + "/" + sDataItem + "/" + stagdetail
 	fmt.Println(" filename:", filepathname)
 	if exists := isFileExists(filepathname); !exists {
-		filepathname = "/" + sdpconn + "/" + stagdetail
+		filepathname = "/" + sdpconn + "/" + sdpname + "/" + sRepoName + "/" + sDataItem + "/" + sTag
 		if exists := isFileExists(filepathname); !exists {
-			filepathname = "/var/lib/datahub/" + sTag
+			filepathname = "/" + sdpconn + "/" + stagdetail
 			if exists := isFileExists(filepathname); !exists {
-				fmt.Println(" filename:", filepathname)
-				//http.NotFound(rw, r)
-				msg.Msg = "tag not found"
-				resp, _ := json.Marshal(msg)
-				respStr := string(resp)
-				fmt.Fprintln(rw, respStr)
-				return
+				filepathname = "/var/lib/datahub/" + sTag
+				if exists := isFileExists(filepathname); !exists {
+					fmt.Println(" filename:", filepathname)
+					//http.NotFound(rw, r)
+					msg.Msg = "tag not found"
+					resp, _ := json.Marshal(msg)
+					respStr := string(resp)
+					fmt.Fprintln(rw, respStr)
+					return
+				}
 			}
 		}
 	}
-	//rw.Header().Set("Content-Type", "file")
+	rw.Header().Set("Content-Type", "file")
 	http.ServeFile(rw, r, filepathname)
 
 	resp, _ := json.Marshal(msg)
