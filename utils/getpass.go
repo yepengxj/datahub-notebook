@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"github.com/golang/crypto/ssh/terminal"
+	"github.com/asiainfoLDP/datahub/utils/terminal"
 	"os"
 	"syscall"
 )
