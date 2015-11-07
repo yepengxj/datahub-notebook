@@ -49,7 +49,7 @@ func pullHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func dl(uri string, p ds.DsPull) error {
 	ip := os.Getenv("DAEMON_IP_PEER")
 	if len(ip) == 0 {
-		ip = "http://127.0.0.1:35800"
+		ip = "http://dogfood.hub.dataos.io:35800"
 	}
 
 	target := ip + uri
@@ -66,6 +66,7 @@ func dl(uri string, p ds.DsPull) error {
 func download(url string, p ds.DsPull) (int64, error) {
 	fmt.Printf("we are going to download %s, save to dp=%s,name=%s\n", url, p.Datapool, p.DestName)
 	out, err := os.OpenFile("/var/lib/datahub/"+p.DestName, os.O_RDWR|os.O_CREATE, 0644)
+
 	if err != nil {
 		return 0, err
 	}
@@ -76,7 +77,6 @@ func download(url string, p ds.DsPull) (int64, error) {
 		return 0, err
 	}
 	out.Seek(stat.Size(), 0)
-
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Set("User-Agent", "go-downloader")
 	/* Set download starting position with 'Range' in HTTP header*/
@@ -95,6 +95,10 @@ func download(url string, p ds.DsPull) (int64, error) {
 		return 0, err
 	}
 	defer resp.Body.Close()
+	fname := resp.Header.Get("Source-Filename")
+	if len(fname) > 0 {
+		p.DestName = fname
+	}
 
 	n, err := io.Copy(out, resp.Body)
 	if err != nil {

@@ -230,6 +230,7 @@ func RunDaemon() {
 func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	fmt.Println("p2p pull...")
 	r.ParseForm()
+
 	//file := r.Form.Get("file")
 	sRepoName := ps.ByName("repo")
 	sDataItem := ps.ByName("dataitem")
@@ -278,12 +279,13 @@ func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 				msg.Msg = "tag not found"
 				resp, _ := json.Marshal(msg)
 				respStr := string(resp)
+				rw.WriteHeader(http.StatusNotFound)
 				fmt.Fprintln(rw, respStr)
 				return
 			}
 		}
 	}
-	//rw.Header().Set("Content-Type", "file")
+	rw.Header().Set("Source-FileName", stagdetail)
 	http.ServeFile(rw, r, filepathname)
 
 	resp, _ := json.Marshal(msg)
