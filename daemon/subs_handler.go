@@ -48,6 +48,7 @@ func pullHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 func dl(uri string, p ds.DsPull) error {
 	ip := os.Getenv("DAEMON_IP_PEER")
+	fmt.Println(ip)
 	if len(ip) == 0 {
 		ip = "http://dogfood.hub.dataos.io:35800"
 	}
