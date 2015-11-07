@@ -13,7 +13,8 @@ ADD . $SRCPATH
 #RUN go get github.com/tools/godep
 #RUN $GOPATH/bin/godep restore
 #RUN $GOPATH/bin/godep go install
-
+run mkdir /var/lib/datahub
+run tar zxvf test/repos.tar.gz -C /var/lib/datahub
 run curl -s https://raw.githubusercontent.com/pote/gpm/v1.3.2/bin/gpm | bash && \
     go build
 
