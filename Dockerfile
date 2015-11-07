@@ -3,9 +3,11 @@
 FROM golang:1.5
 MAINTAINER Zonesan <chaizs@asiainfo.com>
 
-RUN mkdir /home/datahub
-WORKDIR /home/datahub
-ADD . /home/datahub
+ENV SRCPATH $GOPATH/src/github.com/asiainfoLDP/datahub 
+RUN mkdir $SRCPATH
+WORKDIR $SRCPATH
+
+ADD . $SRCPATH
 #COPY . /home/datahub
 #RUN git clone https://github.com/asiainfoLDP/datahub .
 #RUN go get github.com/tools/godep
@@ -15,6 +17,7 @@ ADD . /home/datahub
 run curl -s https://raw.githubusercontent.com/pote/gpm/v1.3.2/bin/gpm | bash && \
     go build
 EXPOSE 35800
+
 ENTRYPOINT $GOPATH/bin/datahub --daemon
 
 
