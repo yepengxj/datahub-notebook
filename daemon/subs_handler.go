@@ -13,7 +13,7 @@ import (
 )
 
 func subsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	fmt.Printf(r.URL.Path + "(subs)\n")
+	fmt.Println(r.URL.Path, "(subs)")
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	commToServer("get", r.URL.Path, reqBody, w)
 
@@ -22,7 +22,7 @@ func subsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func subsDetailHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	fmt.Printf(r.URL.Path + "(subsdetail)\n")
+	fmt.Println(r.URL.Path, "(subsdetail)")
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	commToServer("get", r.URL.Path, reqBody, w)
 

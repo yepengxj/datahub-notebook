@@ -182,7 +182,7 @@ func RunDaemon() {
 	router.GET("/datapools/:dpname", dpGetOneHandler)
 	router.DELETE("/datapools/:dpname", dpDeleteOneHandler)
 
-	router.GET("/subscriptions/:repo/:item", subsDetailHandler)
+	router.GET("/repositories/:repo/:item", subsDetailHandler)
 	router.GET("/subscriptions", subsHandler)
 	router.POST("/subscriptions/:repo/:item/pull", pullHandler)
 
@@ -303,4 +303,10 @@ func sayhello(rw http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	body, _ := ioutil.ReadAll(req.Body)
 	fmt.Fprintf(rw, "%s Hello p2p HTTP !\n", req.URL.Path)
 	fmt.Fprintf(rw, "%s \n", string(body))
+}
+
+func init() {
+	if srv := os.Getenv("DATAHUB_SERVER"); len(srv) > 0 {
+		DefaultServer = srv
+	}
 }

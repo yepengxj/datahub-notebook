@@ -19,6 +19,7 @@ func Subs(login bool, args []string) (err error) {
 
 	uri := "/subscriptions"
 	if len(args) == 1 {
+		uri = "/repositories"
 		uri = uri + "/" + args[0]
 		itemDetail = true
 	}
@@ -34,6 +35,8 @@ func Subs(login bool, args []string) (err error) {
 		} else {
 			fmt.Println(string(body))
 		}
+	} else {
+		fmt.Println(string(body))
 	}
 
 	return err

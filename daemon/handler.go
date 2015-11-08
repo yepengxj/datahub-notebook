@@ -12,11 +12,11 @@ import (
 var (
 	loginLogged   = false
 	loginAuthStr  string
-	DefatulServer = "http://dogfood.hub.dataos.io"
+	DefaultServer = "http://54.223.244.55:8088"
 )
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	url := DefatulServer + "/subscriptions/login"
+	url := DefaultServer + "/subscriptions/login"
 	r.ParseForm()
 
 	if _, ok := r.Header["Authorization"]; !ok {
@@ -99,7 +99,8 @@ func repoHandler(rw http.ResponseWriter, req *http.Request) {
 
 func commToServer(method, path string, buffer []byte, w http.ResponseWriter) (resp *http.Response, err error) {
 
-	req, err := http.NewRequest(method, DefatulServer+path, bytes.NewBuffer(buffer))
+	fmt.Println("daemon: connecting to", DefaultServer+path)
+	req, err := http.NewRequest(method, DefaultServer+path, bytes.NewBuffer(buffer))
 	if len(loginAuthStr) > 0 {
 		req.Header.Set("Authorization", loginAuthStr)
 	}
