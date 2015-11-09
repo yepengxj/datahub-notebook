@@ -50,7 +50,7 @@ func dl(uri string, p ds.DsPull) error {
 	ip := os.Getenv("DAEMON_IP_PEER")
 	fmt.Println(ip)
 	if len(ip) == 0 {
-		ip = "http://dogfood.hub.dataos.io:35800"
+		ip = "http://54.223.244.55:35800"
 	}
 
 	target := ip + uri
