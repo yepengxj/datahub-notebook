@@ -48,7 +48,7 @@ func Pull(login bool, args []string) (err error) {
 		ds.Datapool = args[1]
 	}
 
-	fmt.Println(uri)
+	fmt.Println("uri:", uri)
 
 	jsonData, err := json.Marshal(ds)
 	if err != nil {
