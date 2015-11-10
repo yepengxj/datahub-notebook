@@ -65,18 +65,10 @@ func dpGetAllHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Para
 	r.ParseForm()
 	rw.WriteHeader(http.StatusOK)
 
-	result, _ := ioutil.ReadAll(r.Body)
-	reqJson := cmd.FormatDp{}
-	err := json.Unmarshal(result, &reqJson)
-	if err != nil {
-		fmt.Printf("%T\n%s\n%#v\n", err, err, err)
-		fmt.Println(rw, "invalid argument.")
-	}
-
 	msg := &ds.MsgResp{}
-
 	msg.Msg = "OK."
-	wrtocli := cmd.FormatDp{}
+	dps := []cmd.FormatDp{}
+	onedp := cmd.FormatDp{}
 	sql_dp := fmt.Sprintf(`SELECT DPNAME, DPTYPE FROM DH_DP WHERE STATUS = 'A'`)
 	rows, err := g_ds.QueryRows(sql_dp)
 	if err != nil {
@@ -86,17 +78,19 @@ func dpGetAllHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Para
 	bresultflag := false
 	for rows.Next() {
 		bresultflag = true
-		rows.Scan(&wrtocli.Name, &wrtocli.Type)
-		resp, _ := json.Marshal(wrtocli)
-		respStr := string(resp)
-		fmt.Fprintln(rw, respStr)
+		rows.Scan(&onedp.Name, &onedp.Type)
+		dps = append(dps, onedp)
 	}
 	if bresultflag == false {
 		msg.Msg = "There isn't any datapool."
 		resp, _ := json.Marshal(msg)
 		respStr := string(resp)
 		fmt.Fprintln(rw, respStr)
+		return
 	}
+	resp, _ := json.Marshal(dps)
+	respStr := string(resp)
+	fmt.Fprintln(rw, respStr)
 
 }
 
@@ -105,14 +99,14 @@ func dpGetOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Para
 	rw.WriteHeader(http.StatusOK)
 	dpname := ps.ByName("dpname")
 
-	//In future, we need to get dptype in Json to surpport FILE\ DB\ SDK\ API datapool
+	/*In future, we need to get dptype in Json to surpport FILE\ DB\ SDK\ API datapool
 	result, _ := ioutil.ReadAll(r.Body)
 	reqJson := cmd.FormatDp{}
 	err := json.Unmarshal(result, &reqJson)
 	if err != nil {
 		fmt.Printf("%T\n%s\n%#v\n", err, err, err)
 		fmt.Println(rw, "invalid argument.")
-	}
+	}*/
 
 	msg := &ds.MsgResp{}
 	msg.Msg = "OK."
