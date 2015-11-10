@@ -50,6 +50,12 @@ var Cmd = []Command{
 		Desc: "list all of datapools.",
 	},
 	{
+		Name:      "repo",
+		Handler:   Repo,
+		Desc:      "Repostories mangement",
+		NeedLogin: true,
+	},
+	{
 		Name:      "subs",
 		Handler:   Subs,
 		Desc:      "subscription of item.",
