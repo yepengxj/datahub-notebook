@@ -22,7 +22,6 @@ func Pull(login bool, args []string) (err error) {
 		panic(err)
 	}
 	source := u.Path
-	var uri string
 	if u.Path[0] == '/' {
 		source = u.Path[1:]
 	}
@@ -40,7 +39,7 @@ func Pull(login bool, args []string) (err error) {
 		} else if len(target[1]) == 0 {
 			target[1] = "latest"
 		}
-		uri = fmt.Sprintf("%s/%s:%s", url[0], target[0], target[1])
+		//uri = fmt.Sprintf("%s/%s:%s", url[0], target[0], target[1])
 		repo = url[0]
 		item = target[0]
 		ds.Tag = target[1]
@@ -48,7 +47,7 @@ func Pull(login bool, args []string) (err error) {
 		ds.Datapool = args[1]
 	}
 
-	fmt.Println("uri:", uri)
+	//fmt.Println("uri:", uri)
 
 	jsonData, err := json.Marshal(ds)
 	if err != nil {
