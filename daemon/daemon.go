@@ -203,13 +203,13 @@ func RunDaemon() {
 	}()
 
 	//p2p server
-	router_p2p := httprouter.New()
-	router_p2p.GET("/", sayhello)
-	router_p2p.GET("/pull/:repo/:dataitem/:tag", p2p_pull)
+	P2pRouter := httprouter.New()
+	P2pRouter.GET("/", sayhello)
+	P2pRouter.GET("/pull/:repo/:dataitem/:tag", p2p_pull)
 	go func() {
 		wg.Add(1)
 		defer wg.Done()
-		http.ListenAndServe(":35800", router_p2p)
+		http.ListenAndServe(":35800", P2pRouter)
 	}()
 
 	fmt.Printf("Serving HTTP\n")
