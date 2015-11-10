@@ -231,6 +231,19 @@ func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	fmt.Println("p2p pull...")
 	r.ParseForm()
 
+	/*
+		tokenValid := false
+
+		token := r.Form.Get("token")
+		if len(token) > 0 {
+			fmt.Println(r.URL.Path,"token:", token)
+			tokenValid = checkAccessToken(r.URL.Path)
+		}
+		if !tokenValid {
+			rw.WriteHeader(http.StatusForbidden)
+			return
+		}
+	*/
 	//file := r.Form.Get("file")
 	sRepoName := ps.ByName("repo")
 	sDataItem := ps.ByName("dataitem")
@@ -309,4 +322,30 @@ func init() {
 	if srv := os.Getenv("DATAHUB_SERVER"); len(srv) > 0 {
 		DefaultServer = srv
 	}
+}
+
+func checkAccessToken(tokenUrl string) bool {
+	fmt.Println("daemon: connecting to", DefaultServer+tokenUrl)
+	req, err := http.NewRequest("GET", DefaultServer+tokenUrl, nil)
+	if len(loginAuthStr) > 0 {
+		req.Header.Set("Authorization", loginAuthStr)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	type tokenDs struct {
+		valid bool `json:"valid"`
+	}
+	tkresp := tokenDs{}
+	if err = json.Unmarshal(body, &tkresp); err != nil {
+		return tkresp.valid
+	}
+
+	return false
 }

@@ -33,7 +33,8 @@ func Subs(login bool, args []string) (err error) {
 		if err := Login(false, nil); err == nil {
 			Subs(login, args)
 		} else {
-			fmt.Println(string(body))
+			//fmt.Println(string(body))
+			fmt.Println(resp.StatusCode)
 		}
 	} else {
 		fmt.Println(string(body))
