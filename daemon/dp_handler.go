@@ -95,7 +95,7 @@ func dpGetAllHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 func dpGetOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	r.ParseForm()
-	rw.WriteHeader(http.StatusOK)
+
 	dpname := ps.ByName("dpname")
 
 	/*In future, we need to get dptype in Json to surpport FILE\ DB\ SDK\ API datapool
@@ -165,7 +165,7 @@ func dpGetOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Para
 				onedp.Items = append(onedp.Items, item)
 			}
 		}
-
+		rw.WriteHeader(http.StatusOK)
 		resp, _ := json.Marshal(onedp)
 		fmt.Fprintln(rw, string(resp))
 	}
@@ -174,7 +174,6 @@ func dpGetOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 func dpDeleteOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	r.ParseForm()
-	rw.WriteHeader(http.StatusOK)
 
 	dpname := ps.ByName("dpname")
 	msg := &ds.MsgResp{}
@@ -219,6 +218,7 @@ func dpDeleteOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.P
 				msg.Msg = fmt.Sprintf("Datapool %s with type:%s removed successfully!", dpname, dptype)
 			}
 		}
+		rw.WriteHeader(http.StatusOK)
 		resp, _ := json.Marshal(msg)
 		respStr := string(resp)
 		fmt.Fprintln(rw, respStr)
