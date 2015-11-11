@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 )
@@ -37,9 +38,10 @@ func Dp(needLogin bool, args []string) (err error) {
 		body, _ := ioutil.ReadAll(resp.Body)
 		if resp.StatusCode == 200 {
 			dpResp(false, body)
-			fmt.Println(string(body))
+			//fmt.Println(string(body))
 		} else {
 			fmt.Println(string(body))
+			err = errors.New(string(body))
 		}
 
 	} else {
@@ -51,9 +53,10 @@ func Dp(needLogin bool, args []string) (err error) {
 				body, _ := ioutil.ReadAll(resp.Body)
 				if resp.StatusCode == 200 {
 					dpResp(true, body)
-					fmt.Println(string(body))
+					//fmt.Println(string(body))
 				} else {
 					fmt.Println(string(body))
+					err = errors.New(string(body))
 				}
 			}
 		}
