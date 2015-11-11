@@ -4,20 +4,20 @@
 ----------------
 ### 开始
 
-在安装GO(需要go1.4以上版本)语言和设置了[GOPATH](http://golang.org/doc/code.html#GOPATH)环境变量之后,安装datahub-client:
+在安装GO(需要go1.4以上版本)语言和设置了[GOPATH](http://golang.org/doc/code.html#GOPATH)环境变量之后，安装datahub-client：
 
 ```shell
 go get github.com/asiainfoLDP/datahub
 ```
 
-启动datahub服务:
+#### 启动datahub服务:
 ```shell
 sudo $GOPATH/bin/datahub --daemon
 ```
 
 ### 运行Datahub CLI
 
-Datahub CLI是datahub-client的命令行客户端,用来执行datahub相关命令.
+Datahub CLI是datahub-client的命令行客户端，用来执行datahub相关命令。
 
 - dp        
     - Datapool管理
