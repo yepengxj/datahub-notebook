@@ -40,10 +40,13 @@ func Login(login bool, args []string) (err error) {
 		}
 	}
 	body, _ := ioutil.ReadAll(resp.Body)
+	if login {
+		fmt.Println(resp.StatusCode)
+	}
 	//fmt.Println(resp.StatusCode, string(body))
 	if resp.StatusCode == 401 {
 		return errors.New(string(body))
 	}
-	return err
+	return errors.New(string(body))
 
 }

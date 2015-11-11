@@ -15,7 +15,7 @@ var (
 )
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	url := DefaultServer + "/subscriptions/login"
+	url := DefaultServer + "/users"
 	r.ParseForm()
 
 	if _, ok := r.Header["Authorization"]; !ok {
@@ -25,7 +25,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
+	fmt.Println("login to", url, "Authorization:", r.Header.Get("Authorization"))
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Set("Authorization", r.Header.Get("Authorization"))
 
@@ -38,10 +38,10 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		loginAuthStr = r.Header.Get("Authorization")
 		loginLogged = true
 	}
-
 	w.WriteHeader(resp.StatusCode)
 	body, _ := ioutil.ReadAll(resp.Body)
 	w.Write(body)
+	fmt.Println(resp.StatusCode, string(body))
 	return
 	/*
 		if err != nil || (resp != nil && resp.StatusCode != 200) {
