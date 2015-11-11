@@ -10,7 +10,7 @@
 go get github.com/asiainfoLDP/datahub
 ```
 
-#### 启动datahub服务:
+启动datahub服务:
 ```shell
 sudo $GOPATH/bin/datahub --daemon
 ```
