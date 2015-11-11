@@ -54,5 +54,5 @@ func DpCreate(needLogin bool, args []string) (err error) {
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println(string(body))
 
-	return nil
+	return err
 }
