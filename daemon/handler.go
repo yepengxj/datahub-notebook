@@ -10,7 +10,7 @@ import (
 var (
 	loginLogged   = false
 	loginAuthStr  string
-	DefaultServer = "http://54.223.244.55:8088"
+	DefaultServer = "http://10.1.235.98:8080"
 )
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {

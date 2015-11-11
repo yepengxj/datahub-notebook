@@ -3,13 +3,11 @@ package cmd
 import (
 	"bytes"
 	"fmt"
-	//"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"os"
 	"strings"
-	//"github.com/asiainfoLDP/datahub-client/ds"
 )
 
 type UserInfo struct {
@@ -19,10 +17,10 @@ type UserInfo struct {
 }
 
 var (
-	User          = UserInfo{}
-	UnixSock      = "/var/run/datahub.sock"
-	DefaultServer = "http://10.1.51.32:8080"
-	Logged        = false
+	User     = UserInfo{}
+	UnixSock = "/var/run/datahub.sock"
+	//DefaultServer = "http://10.1.235.98:8080"
+	Logged = false
 )
 
 type Command struct {

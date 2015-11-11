@@ -318,12 +318,6 @@ func sayhello(rw http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 	fmt.Fprintf(rw, "%s \n", string(body))
 }
 
-func init() {
-	if srv := os.Getenv("DATAHUB_SERVER"); len(srv) > 0 {
-		DefaultServer = srv
-	}
-}
-
 func checkAccessToken(tokenUrl string) bool {
 	fmt.Println("daemon: connecting to", DefaultServer+tokenUrl)
 	req, err := http.NewRequest("GET", DefaultServer+tokenUrl, nil)
@@ -348,4 +342,10 @@ func checkAccessToken(tokenUrl string) bool {
 	}
 
 	return false
+}
+
+func init() {
+	if srv := os.Getenv("DATAHUB_SERVER"); len(srv) > 0 {
+		DefaultServer = srv
+	}
 }
