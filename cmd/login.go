@@ -40,7 +40,7 @@ func Login(login bool, args []string) (err error) {
 		}
 	}
 	body, _ := ioutil.ReadAll(resp.Body)
-	if login {
+	if resp.StatusCode != 200 {
 		//fmt.Println(resp.StatusCode, ShowMsgResp(body, false))
 		fmt.Println(resp.StatusCode)
 	}
