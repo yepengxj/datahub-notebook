@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 var (
 	loginLogged   = false
 	loginAuthStr  string
-	DefaultServer = "http://54.223.244.55:8088"
+	DefaultServer = "http://10.1.235.98:8080"
 )
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -64,7 +65,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 func commToServer(method, path string, buffer []byte, w http.ResponseWriter) (resp *http.Response, err error) {
 
 	fmt.Println("daemon: connecting to", DefaultServer+path)
-	req, err := http.NewRequest(method, DefaultServer+path, bytes.NewBuffer(buffer))
+	req, err := http.NewRequest(strings.ToUpper(method), DefaultServer+path, bytes.NewBuffer(buffer))
 	if len(loginAuthStr) > 0 {
 		req.Header.Set("Authorization", loginAuthStr)
 	}

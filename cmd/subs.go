@@ -24,7 +24,7 @@ func Subs(login bool, args []string) (err error) {
 		itemDetail = true
 	}
 
-	resp, err := commToDaemon("get", uri, nil)
+	resp, err := commToDaemon("GET", uri, nil)
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode == 200 {
@@ -33,7 +33,8 @@ func Subs(login bool, args []string) (err error) {
 		if err := Login(false, nil); err == nil {
 			Subs(login, args)
 		} else {
-			fmt.Println(string(body))
+			//fmt.Println(string(body))
+			fmt.Println(resp.StatusCode)
 		}
 	} else {
 		fmt.Println(string(body))

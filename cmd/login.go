@@ -41,6 +41,7 @@ func Login(login bool, args []string) (err error) {
 	}
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println(resp.StatusCode, ShowMsgResp(body, false))
+
 	if resp.StatusCode == 401 {
 		return errors.New(string(body))
 	}
