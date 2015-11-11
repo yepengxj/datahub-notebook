@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"github.com/asiainfoLDP/datahub/utils"
 	"io/ioutil"
@@ -46,8 +45,7 @@ func Login(login bool, args []string) (err error) {
 	}
 
 	if resp.StatusCode == 401 {
-		return errors.New(string(body))
+		return fmt.Errorf(string(body))
 	}
-	return errors.New("login failed")
-
+	return fmt.Errorf("ERROR %d: login failed.", resp.StatusCode)
 }
