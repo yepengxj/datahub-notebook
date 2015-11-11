@@ -31,6 +31,10 @@ type Command struct {
 	NeedLogin bool
 }
 
+type MsgResp struct {
+	Msg string `json:"msg"`
+}
+
 var Cmd = []Command{
 	{
 		Name:    "dp",

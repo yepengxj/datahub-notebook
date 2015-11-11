@@ -41,7 +41,8 @@ func Dp(needLogin bool, args []string) (err error) {
 			//fmt.Println(string(body))
 		} else {
 			fmt.Println(string(body))
-			err = errors.New(string(body))
+			strmsg := ShowMsgResp(body, true)
+			err = errors.New(strmsg)
 		}
 
 	} else {
@@ -55,43 +56,60 @@ func Dp(needLogin bool, args []string) (err error) {
 					dpResp(true, body)
 					//fmt.Println(string(body))
 				} else {
-					fmt.Println(string(body))
-					err = errors.New(string(body))
+					strmsg := ShowMsgResp(body, true)
+					err = errors.New(strmsg)
 				}
 			}
 		}
 	}
-	return nil
+	return err
 }
 
-func dpResp(bDetail bool, byRespBody []byte) {
+func dpResp(bDetail bool, RespBody []byte) {
 	if bDetail == true {
 		//support: dp name1 name2 name3
 		strcDp := FormatDp_dpname{}
-		err := json.Unmarshal(byRespBody, &strcDp)
+		err := json.Unmarshal(RespBody, &strcDp)
 		if err != nil {
 			fmt.Println("Get /datapools/:dpname  dpResp json.Unmarshal error!")
+			return
 		}
 		n, _ := fmt.Printf("datapool:%-16s\t%-16s\t%-16s\n", strcDp.Name, strcDp.Type, strcDp.Conn)
-		printDash(n + 12)
-		for _, item := range strcDp.Items {
-			if item.Publish == "Y" {
-				fmt.Printf("%s/%s/%s\t%-16s\t%4s\n", item.Repository, item.DataItem, item.Tag, item.Time, "pub")
-			} else {
-				fmt.Printf("%s/%s/%s\t%-16s\t%4s\n", item.Repository, item.DataItem, item.Tag, item.Time, "pull")
-			}
 
+		for _, item := range strcDp.Items {
+			RepoItemTag := item.Repository + "/" + item.DataItem + "/" + item.Tag
+			if item.Publish == "Y" {
+				fmt.Printf("%-32s\t%-16s\t%-4s\n", RepoItemTag, item.Time, "pub")
+			} else {
+				fmt.Printf("%-32s\t%-16s\t%-4s\n", RepoItemTag, item.Time, "pull")
+			}
 		}
+		printDash(n + 12)
 	} else {
 		strcDps := []FormatDp{}
-		err := json.Unmarshal(byRespBody, &strcDps)
+		err := json.Unmarshal(RespBody, &strcDps)
 		if err != nil {
 			fmt.Println("Get /datapools  dpResp json.Unmarshal error!")
+			return
 		}
 		n, _ := fmt.Printf("%-16s\t%-8s\n", "datapool", "type")
 		printDash(n + 12)
-		for _, tag := range strcDps {
-			fmt.Printf("%-16s\t%-8s\n", tag.Name, tag.Type)
+		for _, dp := range strcDps {
+			fmt.Printf("%-16s\t%-8s\n", dp.Name, dp.Type)
 		}
 	}
+}
+
+func ShowMsgResp(RespBody []byte, bprint bool) (sMsgResp string) {
+	msg := MsgResp{}
+	err := json.Unmarshal(RespBody, &msg)
+	if err != nil {
+		sMsgResp = err.Error() + "ShowMsgResp unmarshal error!"
+	} else {
+		sMsgResp = msg.Msg
+		if bprint {
+			fmt.Println(sMsgResp)
+		}
+	}
+	return sMsgResp
 }

@@ -22,10 +22,10 @@ func dpPostOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Par
 		err := json.Unmarshal(result, &reqJson)
 		if err != nil {
 			fmt.Printf("%T\n%s\n%#v\n", err, err, err)
-			fmt.Println(rw, "invalid argument.")
+			fmt.Println(rw, "Invalid argument.")
 		}
 		if len(reqJson.Name) == 0 {
-			fmt.Fprintln(rw, "invalid argument.")
+			fmt.Fprintln(rw, "Invalid argument.")
 		} else {
 			msg := &ds.MsgResp{}
 			var sdpDirName string
@@ -63,7 +63,6 @@ func dpPostOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Par
 
 func dpGetAllHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	r.ParseForm()
-	rw.WriteHeader(http.StatusOK)
 
 	msg := &ds.MsgResp{}
 	msg.Msg = "OK."
@@ -82,21 +81,21 @@ func dpGetAllHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Para
 		dps = append(dps, onedp)
 	}
 	if bresultflag == false {
+		rw.WriteHeader(http.StatusNoContent)
 		msg.Msg = "There isn't any datapool."
 		resp, _ := json.Marshal(msg)
-		respStr := string(resp)
-		fmt.Fprintln(rw, respStr)
+		fmt.Fprintln(rw, string(resp))
 		return
 	}
+	rw.WriteHeader(http.StatusOK)
 	resp, _ := json.Marshal(dps)
-	respStr := string(resp)
-	fmt.Fprintln(rw, respStr)
+	fmt.Fprintln(rw, string(resp))
 
 }
 
 func dpGetOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	r.ParseForm()
-	rw.WriteHeader(http.StatusOK)
+
 	dpname := ps.ByName("dpname")
 
 	/*In future, we need to get dptype in Json to surpport FILE\ DB\ SDK\ API datapool
@@ -115,6 +114,7 @@ func dpGetOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Para
 		WHERE STATUS = 'A' AND DPNAME = '%s'`, string(dpname))
 	row, err := g_ds.QueryRow(sql_total)
 	if err != nil {
+		rw.WriteHeader(http.StatusNoContent)
 		msg.Msg = err.Error()
 		resp, _ := json.Marshal(msg)
 		respStr := string(resp)
@@ -124,6 +124,7 @@ func dpGetOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Para
 	var total int
 	row.Scan(&total)
 	if total == 0 {
+		rw.WriteHeader(http.StatusNoContent)
 		msg.Msg = fmt.Sprintf("Datapool %v not found.", dpname)
 		resp, _ := json.Marshal(msg)
 		respStr := string(resp)
@@ -155,26 +156,24 @@ func dpGetOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Para
 				msg.Msg = err.Error()
 			}
 
-			fmt.Println(msg)
+			//fmt.Println(msg)
 			defer tagrows.Close()
 			for tagrows.Next() {
-				fmt.Println(tagrows)
+				//fmt.Println(tagrows)
 				item := cmd.Item{}
 				tagrows.Scan(&item.Repository, &item.DataItem, &item.Tag, &item.Time, &item.Publish)
 				onedp.Items = append(onedp.Items, item)
 			}
 		}
-
+		rw.WriteHeader(http.StatusOK)
 		resp, _ := json.Marshal(onedp)
-		respStr := string(resp)
-		fmt.Fprintln(rw, respStr)
+		fmt.Fprintln(rw, string(resp))
 	}
 
 }
 
 func dpDeleteOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	r.ParseForm()
-	rw.WriteHeader(http.StatusOK)
 
 	dpname := ps.ByName("dpname")
 	msg := &ds.MsgResp{}
@@ -219,14 +218,15 @@ func dpDeleteOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.P
 				msg.Msg = fmt.Sprintf("Datapool %s with type:%s removed successfully!", dpname, dptype)
 			}
 		}
+		rw.WriteHeader(http.StatusOK)
 		resp, _ := json.Marshal(msg)
 		respStr := string(resp)
 		fmt.Fprintln(rw, respStr)
 	}
 	if bresultflag == false {
+		rw.WriteHeader(http.StatusNoContent)
 		msg.Msg = fmt.Sprintf("Datapool %s not found.\n", dpname)
 		resp, _ := json.Marshal(msg)
-		respStr := string(resp)
-		fmt.Fprintln(rw, respStr)
+		fmt.Fprintln(rw, string(resp))
 	}
 }

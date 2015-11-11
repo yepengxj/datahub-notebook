@@ -52,7 +52,7 @@ func DpCreate(needLogin bool, args []string) (err error) {
 	resp, err := commToDaemon("POST", "/datapools", jsonData)
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+	ShowMsgResp(body, true)
 
 	return err
 }
