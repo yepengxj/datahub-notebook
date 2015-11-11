@@ -145,7 +145,7 @@ func isFileExists(file string) bool {
 }
 
 func RunDaemon() {
-	fmt.Println("run daemon..")
+	fmt.Println("Run daemon..")
 	// Daemonizing echo server application.
 	switch isDaemon, err := daemonigo.Daemonize(); {
 	case !isDaemon:
@@ -155,8 +155,6 @@ func RunDaemon() {
 	}
 	//fmt.Printf("server := http.Server{}\n")
 
-	dbinit()
-
 	if false == isDirExists(g_strDpPath) {
 		err := os.MkdirAll(g_strDpPath, 0755)
 		if err != nil {
@@ -164,6 +162,9 @@ func RunDaemon() {
 		}
 
 	}
+
+	dbinit()
+
 	os.Chdir(g_strDpPath)
 	originalListener, err := net.Listen("unix", cmd.UnixSock)
 	if err != nil {

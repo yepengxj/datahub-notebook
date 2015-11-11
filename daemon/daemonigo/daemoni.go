@@ -52,7 +52,7 @@ var pidFile *os.File
 func Daemonize() (isDaemon bool, err error) {
 	const errLoc = "daemonigo.Daemonize()"
 	isDaemon = os.Getenv(EnvVarName) == EnvVarValue
-	fmt.Println("isDaemon ", isDaemon)
+	fmt.Println("IsDaemon: ", isDaemon)
 	if WorkDir != "" {
 		if err = os.Chdir(WorkDir); err != nil {
 			err = fmt.Errorf(
@@ -98,7 +98,7 @@ func Daemonize() (isDaemon bool, err error) {
 
 		//action, exist := actions[flag.Arg(0)]
 		action, exist := actions["daemon"]
-		fmt.Println("exist:", exist)
+		//fmt.Println("exist:", exist)
 		if exist {
 			action()
 		} else {

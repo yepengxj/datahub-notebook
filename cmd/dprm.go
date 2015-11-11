@@ -19,7 +19,7 @@ func DpRm(needLogin bool, args []string) (err error) {
 				resp, _ := commToDaemon("DELETE", str_dpurl, nil)
 				defer resp.Body.Close()
 				body, _ := ioutil.ReadAll(resp.Body)
-				fmt.Println(string(body))
+				ShowMsgResp(body, true)
 			}
 		}
 	}

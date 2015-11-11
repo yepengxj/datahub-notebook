@@ -57,7 +57,7 @@ func Pull(login bool, args []string) (err error) {
 	resp, err := commToDaemon("post", "/subscriptions/"+repo+"/"+item+"/pull", jsonData)
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+	ShowMsgResp(body, true)
 
 	return nil // dl(uri)
 	//return nil
