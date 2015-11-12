@@ -28,7 +28,12 @@ func Subs(login bool, args []string) (err error) {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode == 200 {
-		subsResp(itemDetail, body, args[0])
+		if itemDetail {
+			subsResp(itemDetail, body, args[0])
+		} else {
+			subsResp(itemDetail, body, "")
+		}
+
 	} else if resp.StatusCode == 401 {
 		if err := Login(false, nil); err == nil {
 			Subs(login, args)

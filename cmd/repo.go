@@ -27,7 +27,11 @@ func Repo(login bool, args []string) (err error) {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode == 200 {
-		repoResp(itemDetail, body, args[0])
+		if len(args) == 1 {
+			repoResp(itemDetail, body, args[0])
+		} else {
+			repoResp(itemDetail, body, "")
+		}
 	} else if resp.StatusCode == 401 {
 		if err := Login(false, nil); err == nil {
 			Repo(login, args)
@@ -46,12 +50,12 @@ func repoUsage() {
 }
 
 func repoResp(detail bool, respbody []byte, repoitem string) {
-	fmt.Println(string(respbody))
-	return
+	//fmt.Println(string(respbody))
 
 	if detail {
 		subs := ds.Data{}
-		err := json.Unmarshal(respbody, &subs)
+		result := &Result{Data: &subs}
+		err := json.Unmarshal(respbody, &result)
 		if err != nil {
 			panic(err)
 		}
@@ -62,12 +66,14 @@ func repoResp(detail bool, respbody []byte, repoitem string) {
 		}
 	} else {
 		subs := []ds.Data{}
-		err := json.Unmarshal(respbody, &subs)
+		result := &Result{Data: &subs}
+		err := json.Unmarshal(respbody, &result)
 		if err != nil {
 			panic(err)
 		}
 		n, _ := fmt.Printf("%s/%-8s\t%s\n", "REPOSITORY", "ITEM", "TYPE")
 		printDash(n + 5)
+
 		for _, item := range subs {
 			fmt.Printf("%s/%-8s\t%s\n", item.Repository_name, item.Dataitem_name, "File")
 		}
