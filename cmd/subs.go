@@ -28,7 +28,7 @@ func Subs(login bool, args []string) (err error) {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode == 200 {
-		subsResp(itemDetail, body)
+		subsResp(itemDetail, body, args[0])
 	} else if resp.StatusCode == 401 {
 		if err := Login(false, nil); err == nil {
 			Subs(login, args)
@@ -47,29 +47,31 @@ func subsUsage() {
 	fmt.Printf("usage: %s subs [[URL]/[REPO]/[ITEM]\n", os.Args[0])
 }
 
-func subsResp(detail bool, respbody []byte) {
+func subsResp(detail bool, respbody []byte, repoitem string) {
 
 	if detail {
 		subs := ds.Data{}
-		err := json.Unmarshal(respbody, &subs)
+		result := &Result{Data: &subs}
+		err := json.Unmarshal(respbody, &result)
 		if err != nil {
 			panic(err)
 		}
 		n, _ := fmt.Printf("%s\t%s\n", "REPOSITORY/ITEM[:TAG]", "UPDATETIME")
 		printDash(n + 12)
 		for _, tag := range subs.Tags {
-			fmt.Printf("%s/%s:%-8s\t%s\n", subs.Item.Repository_name, subs.Item.Dataitem_name, tag.Tag, tag.Optime)
+			fmt.Printf("%s:%-8s\t%s\n", repoitem, tag.Tag, tag.Optime)
 		}
 	} else {
 		subs := []ds.Data{}
-		err := json.Unmarshal(respbody, &subs)
+		result := &Result{Data: &subs}
+		err := json.Unmarshal(respbody, &result)
 		if err != nil {
 			panic(err)
 		}
 		n, _ := fmt.Printf("%s/%-8s\t%s\n", "REPOSITORY", "ITEM", "TYPE")
 		printDash(n + 5)
 		for _, item := range subs {
-			fmt.Printf("%s/%-8s\t%s\n", item.Item.Repository_name, item.Item.Dataitem_name, "File")
+			fmt.Printf("%s/%-8s\t%s\n", item.Repository_name, item.Dataitem_name, "File")
 		}
 
 	}

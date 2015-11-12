@@ -27,15 +27,15 @@ func Repo(login bool, args []string) (err error) {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode == 200 {
-		repoResp(itemDetail, body)
+		repoResp(itemDetail, body, args[0])
 	} else if resp.StatusCode == 401 {
 		if err := Login(false, nil); err == nil {
 			Subs(login, args)
 		} else {
-			fmt.Println(string(body))
+			ShowMsgResp(body, true)
 		}
 	} else {
-		fmt.Println(string(body))
+		ShowMsgResp(body, true)
 	}
 
 	return err
@@ -45,7 +45,7 @@ func repoUsage() {
 	fmt.Printf("usage: %s repo [[URL]/[REPO]/[ITEM]\n", os.Args[0])
 }
 
-func repoResp(detail bool, respbody []byte) {
+func repoResp(detail bool, respbody []byte, repoitem string) {
 	fmt.Println(string(respbody))
 	return
 
@@ -58,7 +58,7 @@ func repoResp(detail bool, respbody []byte) {
 		n, _ := fmt.Printf("%s\t%s\n", "REPOSITORY/ITEM[:TAG]", "UPDATETIME")
 		printDash(n + 12)
 		for _, tag := range subs.Tags {
-			fmt.Printf("%s/%s:%-8s\t%s\n", subs.Item.Repository_name, subs.Item.Dataitem_name, tag.Tag, tag.Optime)
+			fmt.Printf("%s:%-8s\t%s\n", repoitem, tag.Tag, tag.Optime)
 		}
 	} else {
 		subs := []ds.Data{}
@@ -69,7 +69,7 @@ func repoResp(detail bool, respbody []byte) {
 		n, _ := fmt.Printf("%s/%-8s\t%s\n", "REPOSITORY", "ITEM", "TYPE")
 		printDash(n + 5)
 		for _, item := range subs {
-			fmt.Printf("%s/%-8s\t%s\n", item.Item.Repository_name, item.Item.Dataitem_name, "File")
+			fmt.Printf("%s/%-8s\t%s\n", item.Repository_name, item.Dataitem_name, "File")
 		}
 
 	}
