@@ -34,7 +34,8 @@ func Subs(login bool, args []string) (err error) {
 			Subs(login, args)
 		} else {
 			//fmt.Println(string(body))
-			fmt.Println(resp.StatusCode)
+			//fmt.Println(resp.StatusCode ,err)
+			fmt.Println(err)
 		}
 	} else {
 		fmt.Println(string(body))

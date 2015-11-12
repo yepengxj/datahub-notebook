@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"github.com/asiainfoLDP/datahub/utils"
 	"io/ioutil"
@@ -40,11 +39,13 @@ func Login(login bool, args []string) (err error) {
 		}
 	}
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(resp.StatusCode, ShowMsgResp(body, false))
+	if resp.StatusCode != 200 {
+		//fmt.Println(resp.StatusCode, ShowMsgResp(body, false))
+		fmt.Println(resp.StatusCode)
+	}
 
 	if resp.StatusCode == 401 {
-		return errors.New(string(body))
+		return fmt.Errorf(string(body))
 	}
-	return err
-
+	return fmt.Errorf("ERROR %d: login failed.", resp.StatusCode)
 }

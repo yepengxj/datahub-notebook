@@ -30,9 +30,9 @@ func Repo(login bool, args []string) (err error) {
 		repoResp(itemDetail, body, args[0])
 	} else if resp.StatusCode == 401 {
 		if err := Login(false, nil); err == nil {
-			Subs(login, args)
+			Repo(login, args)
 		} else {
-			ShowMsgResp(body, true)
+			fmt.Println(err)
 		}
 	} else {
 		ShowMsgResp(body, true)

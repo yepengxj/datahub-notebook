@@ -83,9 +83,10 @@ var Cmd = []Command{
 		NeedLogin: true,
 	},
 	{
-		Name:    "login",
-		Handler: Login,
-		Desc:    "login in to dataos.io.",
+		Name:      "login",
+		Handler:   Login,
+		Desc:      "login in to dataos.io.",
+		NeedLogin: true,
 	},
 }
 
