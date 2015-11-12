@@ -31,9 +31,22 @@ type Command struct {
 	NeedLogin bool
 }
 
+type Result struct {
+	Code int         `json:"code,omitempty"`
+	Msg  string      `json:"mag,omitempty"`
+	Data interface{} `json:"data,omitempty"`
+}
+
 type MsgResp struct {
 	Msg string `json:"msg"`
 }
+
+const (
+	ResultOK         = 100
+	ErrorInvalidPara = iota + 4000
+	ErrorNoRecord
+	ErrorSqlExec
+)
 
 var Cmd = []Command{
 	{
@@ -114,7 +127,7 @@ func commToDaemon(method, path string, jsonData []byte) (resp *http.Response, er
 }
 
 func printDash(n int) {
-	for i := 0; i < n-2; i++ {
+	for i := 0; i < n; i++ {
 		fmt.Printf("-")
 	}
 	fmt.Println()
