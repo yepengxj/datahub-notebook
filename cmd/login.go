@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/asiainfoLDP/datahub/utils"
-	"io/ioutil"
 	"os"
 )
 
@@ -31,21 +30,27 @@ func Login(login bool, args []string) (err error) {
 
 	//req.Header.Set("Authorization", "Basic "+os.Getenv("DAEMON_USER_AUTH_INFO"))
 	resp, err := commToDaemon("get", "/users/auth", nil)
-	if err == nil && resp.StatusCode == 200 {
-		if err = os.Setenv("DAEMON_USER_AUTH_TOKEN", resp.Header.Get("Authorization")); err != nil {
-			panic(err)
-		} else {
-			Logged = true
-		}
-	}
-	body, _ := ioutil.ReadAll(resp.Body)
-	if resp.StatusCode != 200 {
-		//fmt.Println(resp.StatusCode, ShowMsgResp(body, false))
-		fmt.Println(resp.StatusCode)
-	}
+	if err != nil {
 
-	if resp.StatusCode == 401 {
-		return fmt.Errorf(string(body))
+		return err
 	}
-	return fmt.Errorf("ERROR %d: login failed.", resp.StatusCode)
+	defer resp.Body.Close()
+	if resp.StatusCode == 200 {
+		Logged = true
+		return
+	} else {
+		return fmt.Errorf("ERROR %d: login failed.", resp.StatusCode)
+	}
+	/*
+		body, _ := ioutil.ReadAll(resp.Body)
+		if resp.StatusCode != 200 {
+			//fmt.Println(resp.StatusCode, ShowMsgResp(body, false))
+			fmt.Println(resp.StatusCode)
+		}
+
+		if resp.StatusCode == 401 {
+			return fmt.Errorf(string(body))
+		}
+		return fmt.Errorf("ERROR %d: login failed.", resp.StatusCode)
+	*/
 }
