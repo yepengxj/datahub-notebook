@@ -30,9 +30,9 @@ func Login(login bool, args []string) (err error) {
 	//fmt.Printf("%s\n%s:%s\n", User.b64, User.userName, User.password)
 
 	//req.Header.Set("Authorization", "Basic "+os.Getenv("DAEMON_USER_AUTH_INFO"))
-	resp, err := commToDaemon("get", "/login", nil)
+	resp, err := commToDaemon("get", "/users/auth", nil)
 	if err == nil && resp.StatusCode == 200 {
-		if err = os.Setenv("DAEMON_USER_AUTH_INFO", User.b64); err != nil {
+		if err = os.Setenv("DAEMON_USER_AUTH_TOKEN", resp.Header.Get("Authorization")); err != nil {
 			panic(err)
 		} else {
 			Logged = true

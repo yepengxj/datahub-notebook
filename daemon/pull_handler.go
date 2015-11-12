@@ -8,13 +8,14 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
 )
 
 func pullHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	fmt.Println(r.URL.Path + "(pull)\n")
+	log.Println(r.URL.Path + "(pull)\n")
 	result, _ := ioutil.ReadAll(r.Body)
 	reqJson := ds.DsPull{}
 
@@ -49,15 +50,15 @@ func dl(uri string, p ds.DsPull) error {
 	fmt.Println(target)
 	n, err := download(target, p)
 	if err != nil {
-		fmt.Printf("[%d bytes returned.]\n", n)
-		fmt.Println(err)
+		log.Printf("[%d bytes returned.]\n", n)
+		log.Println(err)
 	}
 	return err
 }
 
 /*download routine, supports resuming broken downloads.*/
 func download(url string, p ds.DsPull) (int64, error) {
-	fmt.Printf("we are going to download %s, save to dp=%s,name=%s\n", url, p.Datapool, p.DestName)
+	log.Printf("we are going to download %s, save to dp=%s,name=%s\n", url, p.Datapool, p.DestName)
 	out, err := os.OpenFile("/var/lib/datahub/"+p.DestName, os.O_RDWR|os.O_CREATE, 0644)
 
 	if err != nil {
@@ -74,16 +75,16 @@ func download(url string, p ds.DsPull) (int64, error) {
 	req.Header.Set("User-Agent", "go-downloader")
 	/* Set download starting position with 'Range' in HTTP header*/
 	req.Header.Set("Range", "bytes="+strconv.FormatInt(stat.Size(), 10)+"-")
-	fmt.Printf("%v bytes had already been downloaded.\n", stat.Size())
+	log.Printf("%v bytes had already been downloaded.\n", stat.Size())
 
 	resp, err := http.DefaultClient.Do(req)
 
 	/*Save response body to file only when HTTP 2xx received. TODO*/
 	if err != nil || (resp != nil && resp.StatusCode/100 != 2) {
 		if resp != nil {
-			fmt.Println("http status code:", resp.StatusCode, err)
+			log.Println("http status code:", resp.StatusCode, err)
 			body, _ := ioutil.ReadAll(resp.Body)
-			fmt.Println("response Body:", string(body))
+			log.Println("response Body:", string(body))
 		}
 		return 0, err
 	}
@@ -97,13 +98,13 @@ func download(url string, p ds.DsPull) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	fmt.Printf("%d bytes downloaded.", n)
+	log.Printf("%d bytes downloaded.", n)
 	return n, nil
 }
 
 func getAccessToken(url string, w http.ResponseWriter) (token string, err error) {
 
-	fmt.Println("daemon: connecting to", DefaultServer+url)
+	log.Println("daemon: connecting to", DefaultServer+url)
 	req, err := http.NewRequest("POST", DefaultServer+url, nil)
 	if len(loginAuthStr) > 0 {
 		req.Header.Set("Authorization", loginAuthStr)

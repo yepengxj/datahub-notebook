@@ -22,7 +22,7 @@ func dpPostOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Par
 		err := json.Unmarshal(result, &reqJson)
 		if err != nil {
 			fmt.Printf("%T\n%s\n%#v\n", err, err, err)
-			fmt.Println(rw, "Invalid argument.")
+			fmt.Fprintln(rw, "Invalid argument.")
 		}
 		if len(reqJson.Name) == 0 {
 			fmt.Fprintln(rw, "Invalid argument.")

@@ -37,7 +37,7 @@ type strc_dp struct {
 }
 
 func dbinit() {
-	//log.Println("connect to db sqlite3")
+	log.Println("connect to db sqlite3")
 	db, err := sql.Open("sqlite3", g_dbfile)
 	//defer db.Close()
 	chk(err)
@@ -122,7 +122,7 @@ func stopHttp(rw http.ResponseWriter, req *http.Request) {
 	rw.WriteHeader(http.StatusOK)
 	fmt.Fprintf(rw, "Hello HTTP!\n")
 	sl.Close()
-	fmt.Println("connect close")
+	log.Println("connect close")
 }
 
 func isDirExists(path string) bool {
@@ -138,14 +138,14 @@ func isDirExists(path string) bool {
 func isFileExists(file string) bool {
 	fi, err := os.Stat(file)
 	if err == nil {
-		fmt.Println("exist", file)
+		log.Println("exist", file)
 		return !fi.IsDir()
 	}
 	return os.IsExist(err)
 }
 
 func RunDaemon() {
-	fmt.Println("Run daemon..")
+	log.Println("Run daemon..")
 	// Daemonizing echo server application.
 	switch isDaemon, err := daemonigo.Daemonize(); {
 	case !isDaemon:
@@ -158,7 +158,7 @@ func RunDaemon() {
 	if false == isDirExists(g_strDpPath) {
 		err := os.MkdirAll(g_strDpPath, 0755)
 		if err != nil {
-			fmt.Printf("mkdir %s error! %v ", g_strDpPath, err)
+			log.Printf("mkdir %s error! %v ", g_strDpPath, err)
 		}
 
 	}
@@ -190,7 +190,7 @@ func RunDaemon() {
 
 	http.Handle("/", router)
 	http.HandleFunc("/stop", stopHttp)
-	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/users/auth", loginHandler)
 
 	server := http.Server{}
 
@@ -213,14 +213,14 @@ func RunDaemon() {
 		http.ListenAndServe(":35800", P2pRouter)
 	}()
 
-	fmt.Printf("Serving HTTP\n")
+	log.Printf("Serving HTTP\n")
 	select {
 	case signal := <-stop:
-		fmt.Printf("Got signal:%v\n", signal)
+		log.Printf("Got signal:%v\n", signal)
 	}
-	fmt.Printf("Stopping listener\n")
+	log.Printf("Stopping listener\n")
 	sl.Stop()
-	fmt.Printf("Waiting on server\n")
+	log.Printf("Waiting on server\n")
 	wg.Wait()
 	daemonigo.UnlockPidFile()
 	g_ds.Db.Close()
@@ -229,7 +229,7 @@ func RunDaemon() {
 
 /*pull parses filename and target IP from HTTP GET method, and start downloading routine. */
 func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	fmt.Println("p2p pull...")
+	log.Println("p2p pull...")
 	r.ParseForm()
 
 	/*
@@ -249,7 +249,7 @@ func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	sRepoName := ps.ByName("repo")
 	sDataItem := ps.ByName("dataitem")
 	sTag := ps.ByName("tag")
-	fmt.Println(sRepoName, sDataItem, sTag)
+	log.Println(sRepoName, sDataItem, sTag)
 	var irpdmid, idpid int
 	var stagdetail, sdpname, sdpconn string
 	msg := &ds.MsgResp{}
@@ -271,7 +271,7 @@ func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		msg.Msg = err.Error()
 	}
 	tagrow.Scan(&stagdetail)
-	fmt.Println("tagdetail", stagdetail)
+	log.Println("tagdetail", stagdetail)
 
 	sSqlGetDpconn := fmt.Sprintf(`SELECT DPNAME, DPCONN FROM DH_DP WHERE DPID='%d'`, idpid)
 	dprow, err := g_ds.QueryRow(sSqlGetDpconn)
@@ -320,7 +320,7 @@ func sayhello(rw http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 }
 
 func checkAccessToken(tokenUrl string) bool {
-	fmt.Println("daemon: connecting to", DefaultServer+tokenUrl)
+	log.Println("daemon: connecting to", DefaultServer+tokenUrl)
 	req, err := http.NewRequest("GET", DefaultServer+tokenUrl, nil)
 	if len(loginAuthStr) > 0 {
 		req.Header.Set("Authorization", loginAuthStr)

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -15,7 +16,7 @@ var (
 )
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	url := DefaultServer + "/users"
+	url := DefaultServer + r.URL.Path
 	r.ParseForm()
 
 	if _, ok := r.Header["Authorization"]; !ok {
@@ -25,7 +26,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	fmt.Println("login to", url, "Authorization:", r.Header.Get("Authorization"))
+	log.Println("login to", url, "Authorization:", r.Header.Get("Authorization"))
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Set("Authorization", r.Header.Get("Authorization"))
 
@@ -36,6 +37,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	} else if resp.StatusCode == 200 {
 		loginAuthStr = r.Header.Get("Authorization")
+		log.Println("TODO: change authorization to token")
 		loginLogged = true
 	}
 	w.WriteHeader(resp.StatusCode)
@@ -64,12 +66,13 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 func commToServer(method, path string, buffer []byte, w http.ResponseWriter) (resp *http.Response, err error) {
 
-	fmt.Println("daemon: connecting to", DefaultServer+path)
+	log.Println("daemon: connecting to", DefaultServer+path)
 	req, err := http.NewRequest(strings.ToUpper(method), DefaultServer+path, bytes.NewBuffer(buffer))
 	if len(loginAuthStr) > 0 {
 		req.Header.Set("Authorization", loginAuthStr)
 	}
 
+	req.Header.Set("User", "admin")
 	if resp, err = http.DefaultClient.Do(req); err != nil {
 		w.WriteHeader(http.StatusServiceUnavailable)
 		return

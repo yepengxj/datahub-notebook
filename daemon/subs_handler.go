@@ -1,14 +1,14 @@
 package daemon
 
 import (
-	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
 func subsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	fmt.Println(r.URL.Path, "(subs)")
+	log.Println(r.URL.Path, "(subs)")
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	commToServer("get", r.URL.Path, reqBody, w)
 
@@ -17,7 +17,7 @@ func subsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func subsDetailHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	fmt.Println(r.URL.Path, "(subsdetail)")
+	log.Println(r.URL.Path, "(subsdetail)")
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	commToServer("get", r.URL.Path, reqBody, w)
 
