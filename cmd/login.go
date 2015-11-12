@@ -36,6 +36,7 @@ func Login(login bool, args []string) (err error) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == 200 {
+		fmt.Printf("%v\n", resp.StatusCode)
 		Logged = true
 		return
 	} else {
