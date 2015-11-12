@@ -14,6 +14,12 @@ import (
 	"strconv"
 )
 
+type AccessToken struct {
+	Accesstoken   string `json:"accesstoken,omitempty"`
+	Remainingtime string `json:"remainingtime,omitempty"`
+	Entrypoint    string `json:"entrypoint,omitempty"`
+}
+
 func pullHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log.Println(r.URL.Path + "(pull)\n")
 	result, _ := ioutil.ReadAll(r.Body)
@@ -25,22 +31,28 @@ func pullHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 	url := "/transaction/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag
-	//fmt.Fprintln(w, url)
-	/*
-		if token, err := getAccessToken(url, w); err != nil {
+	fmt.Fprintln(w, url)
 
-			return
-		} else {
-			url = "/pull/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag + "?token=" + token
-		}
-	*/
-	go dl(url, reqJson)
+	token, entrypoint, err := getAccessToken(url, w)
+	if err != nil {
+		return
+	} else {
+		url = "/pull/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag + "?token=" + token
+	}
+
+	go dl(url, entrypoint, reqJson)
 	return
 
 }
 
-func dl(uri string, p ds.DsPull) error {
-	ip := os.Getenv("DAEMON_IP_PEER")
+func dl(uri, entrypoint string, p ds.DsPull) error {
+	var ip string
+	if entrypoint == "" {
+		ip = os.Getenv("DAEMON_IP_PEER")
+	} else {
+		ip = entrypoint
+	}
+
 	fmt.Println(ip)
 	if len(ip) == 0 {
 		ip = "http://54.223.244.55:35800"
@@ -102,7 +114,7 @@ func download(url string, p ds.DsPull) (int64, error) {
 	return n, nil
 }
 
-func getAccessToken(url string, w http.ResponseWriter) (token string, err error) {
+func getAccessToken(url string, w http.ResponseWriter) (token, entrypoint string, err error) {
 
 	log.Println("daemon: connecting to", DefaultServer+url)
 	req, err := http.NewRequest("POST", DefaultServer+url, nil)
@@ -113,7 +125,7 @@ func getAccessToken(url string, w http.ResponseWriter) (token string, err error)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		//w.WriteHeader(http.StatusServiceUnavailable)
-		return "", err
+		return "", "", err
 	}
 	defer resp.Body.Close()
 
@@ -121,23 +133,21 @@ func getAccessToken(url string, w http.ResponseWriter) (token string, err error)
 		w.WriteHeader(resp.StatusCode)
 		body, _ := ioutil.ReadAll(resp.Body)
 		w.Write(body)
-		return "", errors.New(string(body))
+		return "", "", errors.New(string(body))
 	} else {
 		body, _ := ioutil.ReadAll(resp.Body)
-		type tk struct {
-			t string `json:"accesstoken,omitempty"`
-		}
-		t := tk{}
+
+		t := AccessToken{}
 		if err = json.Unmarshal(body, &t); err != nil {
-			return "", err
+			return "", "", err
 		} else {
-			if len(t.t) > 0 {
-				return t.t, nil
+			if len(t.Accesstoken) > 0 {
+				return t.Accesstoken, t.Entrypoint, nil
 			}
 
 		}
 
 	}
-	return "", errors.New("get access token error.")
+	return "", "", errors.New("get access token error.")
 
 }
