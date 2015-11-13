@@ -37,7 +37,7 @@ func Login(login bool, args []string) (err error) {
 	userJson := UserForJson{Username: User.userName}
 	jsondata, _ := json.Marshal(userJson)
 
-	resp, err := commToDaemon("get", "/users/auth", jsondata)
+	resp, err := commToDaemon("get", "/", jsondata) //users/auth
 	if err != nil {
 
 		return err

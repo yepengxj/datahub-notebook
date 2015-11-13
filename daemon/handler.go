@@ -68,7 +68,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println(loginAuthStr)
 		}
 	}
-
+	w.WriteHeader(resp.StatusCode)
 	/*
 		if err != nil || (resp != nil && resp.StatusCode != 200) {
 			if resp != nil {

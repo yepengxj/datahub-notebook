@@ -69,7 +69,7 @@ func Pull(login bool, args []string) (err error) {
 	}
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(body)
+	fmt.Println(string(body))
 
 	return nil // dl(uri)
 	//return nil
