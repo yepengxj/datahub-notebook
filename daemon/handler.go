@@ -13,8 +13,13 @@ import (
 var (
 	loginLogged   = false
 	loginAuthStr  string
+	gstrUsername  string
 	DefaultServer = "http://10.1.235.98:8888"
 )
+
+type UserForJson struct {
+	Username string `json:"username", omitempty`
+}
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	url := DefaultServer + r.URL.Path
@@ -27,6 +32,14 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	userjsonbody, _ := ioutil.ReadAll(r.Body)
+	userforjson := UserForJson{}
+	if err := json.Unmarshal(userjsonbody, &userforjson); err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	gstrUsername = userforjson.Username
+
 	log.Println("login to", url, "Authorization:", r.Header.Get("Authorization"))
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Set("Authorization", r.Header.Get("Authorization"))

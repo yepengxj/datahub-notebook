@@ -231,24 +231,27 @@ func RunDaemon() {
 func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log.Println("p2p pull...")
 	r.ParseForm()
-
-	/*
-		tokenValid := false
-
-		token := r.Form.Get("token")
-		if len(token) > 0 {
-			fmt.Println(r.URL.Path,"token:", token)
-			tokenValid = checkAccessToken(r.URL.Path)
-		}
-		if !tokenValid {
-			rw.WriteHeader(http.StatusForbidden)
-			return
-		}
-	*/
-	//file := r.Form.Get("file")
 	sRepoName := ps.ByName("repo")
 	sDataItem := ps.ByName("dataitem")
 	sTag := ps.ByName("tag")
+
+	tokenValid := false
+
+	token := r.Form.Get("token")
+	username := r.Form.Get("username")
+	if len(token) > 0 && len(username) > 0 {
+		fmt.Println(r.URL.Path, "token:", token, "username:", username)
+		url := "/transaction/" + sRepoName + "/" + sDataItem + "/" + sTag +
+			"?cypt_accesstoken=" + token + "?username" + username
+		tokenValid = checkAccessToken(url)
+	}
+	if !tokenValid {
+		rw.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	//file := r.Form.Get("file")
+
 	log.Println(sRepoName, sDataItem, sTag)
 	var irpdmid, idpid int
 	var stagdetail, sdpname, sdpconn string
@@ -335,11 +338,11 @@ func checkAccessToken(tokenUrl string) bool {
 	body, _ := ioutil.ReadAll(resp.Body)
 
 	type tokenDs struct {
-		valid bool `json:"valid"`
+		Valid bool `json:"valid"`
 	}
 	tkresp := tokenDs{}
-	if err = json.Unmarshal(body, &tkresp); err != nil {
-		return tkresp.valid
+	if err = json.Unmarshal(body, &tkresp); err == nil {
+		return tkresp.Valid
 	}
 
 	return false

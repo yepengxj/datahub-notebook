@@ -5,10 +5,15 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"github.com/asiainfoLDP/datahub/utils"
 	"os"
 )
+
+type UserForJson struct {
+	Username string `json:"username", omitempty`
+}
 
 func Login(login bool, args []string) (err error) {
 	fmt.Printf("login: ")
@@ -29,7 +34,10 @@ func Login(login bool, args []string) (err error) {
 	//fmt.Printf("%s\n%s:%s\n", User.b64, User.userName, User.password)
 
 	//req.Header.Set("Authorization", "Basic "+os.Getenv("DAEMON_USER_AUTH_INFO"))
-	resp, err := commToDaemon("get", "/users/auth", nil)
+	userJson := UserForJson{Username: User.userName}
+	jsondata, _ := json.Marshal(userJson)
+
+	resp, err := commToDaemon("get", "/users/auth", jsondata)
 	if err != nil {
 
 		return err

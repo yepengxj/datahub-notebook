@@ -39,7 +39,7 @@ func Repo(login bool, args []string) (err error) {
 			fmt.Println(err)
 		}
 	} else {
-		ShowMsgResp(body, true)
+		fmt.Println(resp.StatusCode)
 	}
 
 	return err

@@ -40,8 +40,8 @@ func Dp(needLogin bool, args []string) (err error) {
 			dpResp(false, body)
 		} else {
 			fmt.Println(string(body))
-			strmsg := GetResultMsg(body, true)
-			err = errors.New(strmsg)
+			fmt.Println(resp.StatusCode)
+			err = errors.New(string(resp.StatusCode))
 		}
 
 	} else {
@@ -55,8 +55,8 @@ func Dp(needLogin bool, args []string) (err error) {
 				if resp.StatusCode == 200 {
 					dpResp(true, body)
 				} else {
-					strmsg := GetResultMsg(body, true)
-					err = errors.New(strmsg)
+					fmt.Println(resp.StatusCode)
+					err = errors.New(string(resp.StatusCode))
 				}
 			}
 		}
