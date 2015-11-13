@@ -15,12 +15,3 @@ func subsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	return
 
 }
-
-func subsDetailHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	log.Println(r.URL.Path, "(subsdetail)")
-	reqBody, _ := ioutil.ReadAll(r.Body)
-	commToServer("get", r.URL.Path, reqBody, w)
-
-	return
-
-}
