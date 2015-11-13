@@ -46,6 +46,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := http.DefaultClient.Do(req)
 	defer resp.Body.Close()
+	log.Println("login return", resp.StatusCode)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -66,9 +67,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			loginAuthStr = "Token " + token.Token
 			loginLogged = true
 			log.Println(loginAuthStr)
-			w.WriteHeader(resp.StatusCode)
 		}
 	}
+	w.WriteHeader(resp.StatusCode)
 
 }
 

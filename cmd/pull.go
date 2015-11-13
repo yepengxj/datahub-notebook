@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/asiainfoLDP/datahub/ds"
-	"io/ioutil"
+	//"io/ioutil"
 	"net/url"
 	"os"
 	"strings"
@@ -55,21 +55,27 @@ func Pull(login bool, args []string) (err error) {
 	}
 
 	resp, err := commToDaemon("post", "/subscriptions/"+repo+"/"+item+"/pull", jsonData)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(2)
+	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
+		fmt.Printf("%s/%s:%s will be download to %s\n.", repo, item, ds.Tag, ds.Datapool)
 
 	} else if resp.StatusCode == 401 {
 		if err := Login(false, nil); err == nil {
 			Pull(login, args)
 		} else {
 			fmt.Println(err)
+			return err
 		}
 	} else {
 		fmt.Println(resp.StatusCode)
 	}
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(body)
+	//body, _ := ioutil.ReadAll(resp.Body)
+	//fmt.Println(body)
 
 	return nil // dl(uri)
 	//return nil

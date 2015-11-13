@@ -39,14 +39,15 @@ func Login(login bool, args []string) (err error) {
 
 	resp, err := commToDaemon("get", "/users/auth", jsondata)
 	if err != nil {
-
 		return err
 	}
 	defer resp.Body.Close()
+	//fmt.Println("login return", resp.StatusCode)
 	if resp.StatusCode == 200 {
 		Logged = true
 		return
 	} else {
+		//fmt.Println("login ddddddd failed.")
 		return fmt.Errorf("ERROR %d: login failed.", resp.StatusCode)
 	}
 	/*

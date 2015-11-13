@@ -33,6 +33,7 @@ func Repo(login bool, args []string) (err error) {
 			repoResp(itemDetail, body, "")
 		}
 	} else if resp.StatusCode == 401 {
+		//fmt.Println(resp.StatusCode, "returned....")
 		if err := Login(false, nil); err == nil {
 			Repo(login, args)
 		} else {
