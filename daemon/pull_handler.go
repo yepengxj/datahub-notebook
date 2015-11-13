@@ -31,14 +31,15 @@ func pullHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 	url := "/transaction/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag
-	fmt.Fprintln(w, url)
 
 	token, entrypoint, err := getAccessToken(url, w)
 	if err != nil {
 		return
 	} else {
-		url = "/pull/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag + "?token=" + token
+		url = "/pull/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag +
+			"?token=" + token + "?username=" + gstrUsername
 	}
+	//fmt.Fprintln(w, url)
 
 	go dl(url, entrypoint, reqJson)
 	return
@@ -142,6 +143,7 @@ func getAccessToken(url string, w http.ResponseWriter) (token, entrypoint string
 			return "", "", err
 		} else {
 			if len(t.Accesstoken) > 0 {
+				w.WriteHeader(http.StatusOK)
 				return t.Accesstoken, t.Entrypoint, nil
 			}
 
