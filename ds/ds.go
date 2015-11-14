@@ -12,9 +12,11 @@ type FormatRepoList struct {
 }
 
 type DsPull struct {
-	Tag      string `json:"tag"`
-	Datapool string `json:"datapool"`
-	DestName string `json:"destname"`
+	Tag        string `json:"tag"`
+	Datapool   string `json:"datapool"`
+	DestName   string `json:"destname"`
+	Repository string `json:"repository, omitempty"`
+	Dataitem   string `jsong:"dataitem, omitempty"`
 }
 
 const (

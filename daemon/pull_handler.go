@@ -30,6 +30,13 @@ func pullHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		w.Write([]byte(err.Error()))
 		return
 	}
+
+	if exist := CheckDataPoolExist(reqJson.Datapool); exist == false {
+		fmt.Println(reqJson.Datapool, "not found.", reqJson.Tag, "will be pull into", g_strDpPath)
+	}
+
+	reqJson.Repository = ps.ByName("repo")
+	reqJson.Dataitem = ps.ByName("item")
 	url := "/transaction/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag
 
 	token, entrypoint, err := getAccessToken(url, w)
@@ -72,7 +79,22 @@ func dl(uri, entrypoint string, p ds.DsPull) error {
 /*download routine, supports resuming broken downloads.*/
 func download(url string, p ds.DsPull) (int64, error) {
 	log.Printf("we are going to download %s, save to dp=%s,name=%s\n", url, p.Datapool, p.DestName)
-	out, err := os.OpenFile("/var/lib/datahub/"+p.DestName, os.O_RDWR|os.O_CREATE, 0644)
+
+	var out *os.File
+	var err error
+	var destfilename string
+	dpexist := CheckDataPoolExist(p.Datapool)
+	if dpexist == false {
+		destfilename = g_strDpPath + p.DestName
+	} else {
+		dpconn := GetDataPoolDpconn(p.Datapool)
+		if len(dpconn) == 0 {
+			destfilename = g_strDpPath + p.DestName
+		} else {
+			destfilename = dpconn + p.DestName
+		}
+	}
+	out, err = os.OpenFile(destfilename, os.O_RDWR|os.O_CREATE, 0644)
 
 	if err != nil {
 		return 0, err
@@ -112,6 +134,7 @@ func download(url string, p ds.DsPull) (int64, error) {
 		return 0, err
 	}
 	log.Printf("%d bytes downloaded.", n)
+	InsertTagToDb(dpexist, p)
 	return n, nil
 }
 
