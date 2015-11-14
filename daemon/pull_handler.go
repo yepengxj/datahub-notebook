@@ -24,6 +24,7 @@ func pullHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	log.Println(r.URL.Path + "(pull)\n")
 	result, _ := ioutil.ReadAll(r.Body)
 	reqJson := ds.DsPull{}
+	var strret string
 
 	if err := json.Unmarshal(result, &reqJson); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -31,12 +32,18 @@ func pullHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
-	if exist := CheckDataPoolExist(reqJson.Datapool); exist == false {
-		fmt.Println(reqJson.Datapool, "not found.", reqJson.Tag, "will be pull into", g_strDpPath)
-	}
-
 	reqJson.Repository = ps.ByName("repo")
 	reqJson.Dataitem = ps.ByName("item")
+	if exist := CheckDataPoolExist(reqJson.Datapool); exist == false {
+		strret = reqJson.Datapool + " not found. " + reqJson.Tag + " will be pull into " + g_strDpPath
+	} else {
+		strret = reqJson.Repository + "/" + reqJson.Dataitem + "/" + reqJson.Tag + " will be pull into " + reqJson.Datapool
+	}
+	fmt.Println(strret)
+	msgret := ds.MsgResp{Msg: strret}
+	resp, _ := json.Marshal(msgret)
+	w.Write(resp)
+
 	//url := "/transaction/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag
 
 	//token, entrypoint, err := getAccessToken(url, w)
@@ -104,9 +111,11 @@ func download(url string, p ds.DsPull) (int64, error) {
 		if len(dpconn) == 0 {
 			destfilename = g_strDpPath + p.DestName
 		} else {
-			destfilename = dpconn + p.DestName
+			os.MkdirAll(dpconn+"/"+p.Datapool+"/"+p.Repository+"/"+p.Dataitem, 0755)
+			destfilename = dpconn + "/" + p.Datapool + "/" + p.Repository + "/" + p.Dataitem + "/" + p.DestName
 		}
 	}
+	fmt.Println(destfilename)
 	out, err = os.OpenFile(destfilename, os.O_RDWR|os.O_CREATE, 0644)
 
 	if err != nil {
