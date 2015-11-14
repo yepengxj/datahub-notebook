@@ -183,7 +183,7 @@ func RunDaemon() {
 	router.GET("/datapools/:dpname", dpGetOneHandler)
 	router.DELETE("/datapools/:dpname", dpDeleteOneHandler)
 
-	router.GET("/repositories/:repo/:item", subsDetailHandler)
+	router.GET("/repositories/:repo/:item", repoDetailHandler)
 	router.GET("/repositories", repoHandler)
 	router.GET("/subscriptions", subsHandler)
 	router.POST("/subscriptions/:repo/:item/pull", pullHandler)

@@ -4,6 +4,7 @@ FROM golang:1.5
 MAINTAINER Zonesan <chaizs@asiainfo.com>
 
 ENV SRCPATH $GOPATH/src/github.com/asiainfoLDP/datahub 
+ENV PATH $PATH:$GOPATH/bin
 RUN mkdir $SRCPATH -p
 WORKDIR $SRCPATH
 
@@ -14,9 +15,9 @@ ADD . $SRCPATH
 #RUN $GOPATH/bin/godep restore
 #RUN $GOPATH/bin/godep go install
 run mkdir /var/lib/datahub
-run tar zxvf test/repos.tar.gz -C /var/lib/datahub
+#run tar zxvf test/repos.tar.gz -C /var/lib/datahub
 run curl -s https://raw.githubusercontent.com/pote/gpm/v1.3.2/bin/gpm | bash && \
-    go build
+    go install
 
 EXPOSE 35800
 

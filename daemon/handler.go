@@ -46,6 +46,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := http.DefaultClient.Do(req)
 	defer resp.Body.Close()
+	log.Println("login return", resp.StatusCode)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -69,23 +70,6 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	w.WriteHeader(resp.StatusCode)
-	/*
-		if err != nil || (resp != nil && resp.StatusCode != 200) {
-			if resp != nil {
-				w.WriteHeader(resp.StatusCode)
-				fmt.Println("http status code:", resp.StatusCode, err)
-				body, _ := ioutil.ReadAll(resp.Body)
-				fmt.Println("response Body:", string(body))
-			}
-
-			//fmt.Fprintln(w, resp)
-			return
-		} else {
-			loginAuthStr = r.Header.Get("Authorization")
-			loginLogged = true
-		}
-		w.WriteHeader(resp.StatusCode)
-	*/
 }
 
 func commToServer(method, path string, buffer []byte, w http.ResponseWriter) (resp *http.Response, err error) {
