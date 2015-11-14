@@ -37,15 +37,15 @@ func pullHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	reqJson.Repository = ps.ByName("repo")
 	reqJson.Dataitem = ps.ByName("item")
-	url := "/transaction/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag
+	//url := "/transaction/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag
 
-	token, entrypoint, err := getAccessToken(url, w)
-	if err != nil {
+	//token, entrypoint, err := getAccessToken(url, w)
+	/*if err != nil {
 		return
 	} else {
 		url = "/pull/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag +
 			"?token=" + token + "?username=" + gstrUsername
-	}
+	}*/
 	//fmt.Fprintln(w, url)
 	/*
 		url := "/transaction/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag
@@ -59,8 +59,8 @@ func pullHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		}
 		//fmt.Fprintln(w, url)
 	*/
-	//url := "/transaction/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag
-	//entrypoint := ""
+	url := "/pull/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag
+	entrypoint := ""
 	go dl(url, entrypoint, reqJson)
 	return
 

@@ -245,10 +245,10 @@ func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 			"?cypt_accesstoken=" + token + "?username" + username
 		tokenValid = checkAccessToken(url)
 	}
-	if !tokenValid {
-		rw.WriteHeader(http.StatusForbidden)
-		return
-	}
+	//if !tokenValid {
+	//	rw.WriteHeader(http.StatusForbidden)
+	//	return
+	//}
 
 	//file := r.Form.Get("file")
 
