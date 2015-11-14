@@ -234,7 +234,6 @@ func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	sRepoName := ps.ByName("repo")
 	sDataItem := ps.ByName("dataitem")
 	sTag := ps.ByName("tag")
-<<<<<<< HEAD
 	/*
 		tokenValid := false
 
@@ -247,7 +246,7 @@ func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 			tokenValid = checkAccessToken(url)
 		}
 	*/
-		
+
 	//if !tokenValid {
 	//	rw.WriteHeader(http.StatusForbidden)
 	//	return
