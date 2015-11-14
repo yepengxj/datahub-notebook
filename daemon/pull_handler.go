@@ -30,17 +30,20 @@ func pullHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		w.Write([]byte(err.Error()))
 		return
 	}
+	/*
+		url := "/transaction/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag
+
+		token, entrypoint, err := getAccessToken(url, w)
+		if err != nil {
+			return
+		} else {
+			url = "/pull/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag +
+				"?token=" + token + "?username=" + gstrUsername
+		}
+		//fmt.Fprintln(w, url)
+	*/
 	url := "/transaction/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag
-
-	token, entrypoint, err := getAccessToken(url, w)
-	if err != nil {
-		return
-	} else {
-		url = "/pull/" + ps.ByName("repo") + "/" + ps.ByName("item") + "/" + reqJson.Tag +
-			"?token=" + token + "?username=" + gstrUsername
-	}
-	//fmt.Fprintln(w, url)
-
+	entrypoint := ""
 	go dl(url, entrypoint, reqJson)
 	return
 
@@ -116,8 +119,10 @@ func download(url string, p ds.DsPull) (int64, error) {
 }
 
 func getAccessToken(url string, w http.ResponseWriter) (token, entrypoint string, err error) {
+	log.Println("can't get access token,direct download..")
+	return nil
 
-	log.Println("daemon: connecting to", DefaultServer+url)
+	log.Println("daemon: connecting to", DefaultServer+url, "to get accesstoken")
 	req, err := http.NewRequest("POST", DefaultServer+url, nil)
 	if len(loginAuthStr) > 0 {
 		req.Header.Set("Authorization", loginAuthStr)
@@ -130,6 +135,8 @@ func getAccessToken(url string, w http.ResponseWriter) (token, entrypoint string
 	}
 	defer resp.Body.Close()
 
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println(resp.StatusCode, string(body))
 	if resp.StatusCode != 200 {
 		w.WriteHeader(resp.StatusCode)
 		body, _ := ioutil.ReadAll(resp.Body)

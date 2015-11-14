@@ -22,7 +22,7 @@ type UserForJson struct {
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	url := DefaultServer + r.URL.Path
+	url := DefaultServer + "/" //r.URL.Path
 	r.ParseForm()
 
 	if _, ok := r.Header["Authorization"]; !ok {
