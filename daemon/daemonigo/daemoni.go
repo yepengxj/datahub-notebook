@@ -38,7 +38,7 @@ var AppName = "daemon"
 
 // Path to application executable.
 // Used only for default start/restart actions.
-var AppPath = "./" + filepath.Base(os.Args[0])
+//var AppPath = "./" + filepath.Base(os.Args[0])
 
 // Absolute or relative path from working directory to PID file.
 
@@ -220,14 +220,14 @@ func Status() (isRunning bool, pr *os.Process, e error) {
 // This function can also be used when writing your own daemon actions.
 func StartCommand() (*exec.Cmd, error) {
 	const errLoc = "daemonigo.StartCommand()"
-	path, err := filepath.Abs(AppPath)
+	path, err := filepath.Abs(os.Args[0])
+	fmt.Println("exec path", path)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"%s: failed to resolve absolute path of %s, reason -> %s",
 			errLoc, AppName, err.Error(),
 		)
 	}
-	fmt.Println("path:", path)
 	cmd := exec.Command(path, "--daemon")
 	cmd.Env = append(
 		os.Environ(), fmt.Sprintf("%s=%s", EnvVarName, EnvVarValue),
