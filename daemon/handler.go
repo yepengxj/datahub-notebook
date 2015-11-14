@@ -14,7 +14,7 @@ var (
 	loginLogged   = false
 	loginAuthStr  string
 	gstrUsername  string
-	DefaultServer = "http://10.1.235.98:8888"
+	DefaultServer = "http://54.223.82.149:8888"
 )
 
 type UserForJson struct {
@@ -45,6 +45,10 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("Authorization", r.Header.Get("Authorization"))
 
 	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	defer resp.Body.Close()
 	log.Println("login return", resp.StatusCode)
 	if err != nil {
