@@ -235,7 +235,7 @@ func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	sDataItem := ps.ByName("dataitem")
 	sTag := ps.ByName("tag")
 
-	tokenValid := false
+	/*tokenValid := false
 
 	token := r.Form.Get("token")
 	username := r.Form.Get("username")
@@ -244,7 +244,7 @@ func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		url := "/transaction/" + sRepoName + "/" + sDataItem + "/" + sTag +
 			"?cypt_accesstoken=" + token + "?username" + username
 		tokenValid = checkAccessToken(url)
-	}
+	}*/
 	//if !tokenValid {
 	//	rw.WriteHeader(http.StatusForbidden)
 	//	return
