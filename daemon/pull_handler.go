@@ -76,7 +76,7 @@ func dl(uri, entrypoint string, p ds.DsPull) error {
 
 	fmt.Println(ip)
 	if len(ip) == 0 {
-		ip = "http://54.223.244.55:35800"
+		ip = "http://54.223.82.149:35800"
 	}
 
 	target := ip + uri
@@ -152,8 +152,8 @@ func download(url string, p ds.DsPull) (int64, error) {
 }
 
 func getAccessToken(url string, w http.ResponseWriter) (token, entrypoint string, err error) {
-	log.Println("can't get access token,direct download..")
-	return nil
+	//log.Println("can't get access token,direct download..")
+	//return nil
 
 	log.Println("daemon: connecting to", DefaultServer+url, "to get accesstoken")
 	req, err := http.NewRequest("POST", DefaultServer+url, nil)
