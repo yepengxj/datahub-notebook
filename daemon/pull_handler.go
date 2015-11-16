@@ -83,7 +83,7 @@ func dl(uri, entrypoint string, p ds.DsPull) error {
 
 	fmt.Println(ip)
 	if len(ip) == 0 {
-		ip = "http://54.223.82.149:35800"
+		ip = "http://54.223.58.0:35800"
 	}
 
 	target := ip + uri

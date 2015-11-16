@@ -14,7 +14,7 @@ var (
 	loginLogged   = false
 	loginAuthStr  string
 	gstrUsername  string
-	DefaultServer = "http://54.223.82.149:8888"
+	DefaultServer = "http://54.223.58.0:8888"
 )
 
 type UserForJson struct {
