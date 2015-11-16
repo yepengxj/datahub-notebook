@@ -242,7 +242,7 @@ func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		if len(token) > 0 && len(username) > 0 {
 			log.Println(r.URL.Path, "token:", token, "username:", username)
 			url := "/transaction/" + sRepoName + "/" + sDataItem + "/" + sTag +
-				"?cypt_accesstoken=" + token + "?username" + username
+				"?cypt_accesstoken=" + token + "&username=" + username
 			tokenValid = checkAccessToken(url)
 		}
 	*/
