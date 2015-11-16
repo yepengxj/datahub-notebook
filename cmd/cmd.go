@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+const GstrDpPath string = "/var/lib/datahub/"
+
 type UserInfo struct {
 	userName string
 	password string

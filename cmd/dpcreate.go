@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/asiainfoLDP/datahub/utils/mflag"
 	"io/ioutil"
+	"strings"
 )
 
 type FormatDpCreate struct {
@@ -25,12 +26,14 @@ func DpCreate(needLogin bool, args []string) (err error) {
 	}
 
 	if len(args) == 0 {
-
-		fmt.Printf("missing argument.\nSee '%s --help'.\n", f.Name())
-		return
+		d.Conn = GstrDpPath
+		d.Type = "file"
+		//fmt.Printf("missing argument.\nSee '%s --help'.\n", f.Name())
+		//return
 	}
 
 	if err = f.Parse(args); err != nil {
+		fmt.Println("parse parameter error")
 		return
 	}
 
@@ -38,6 +41,12 @@ func DpCreate(needLogin bool, args []string) (err error) {
 		fmt.Printf("invalid argument.\nSee '%s --help'.\n", f.Name())
 		return
 
+	}
+
+	dptype := strings.ToLower(d.Type)
+	if dptype != "file" && dptype != "db" && dptype != "hadoop" && dptype != "api" && dptype != "storm" {
+		fmt.Println("Datapool type need to be :file,db,hadoop,api,storm")
+		return
 	}
 
 	jsonData, err := json.Marshal(d)

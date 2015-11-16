@@ -121,10 +121,10 @@ func download(url string, p ds.DsPull) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	defer out.Close()
 
 	stat, err := out.Stat()
 	if err != nil {
+		out.Close()
 		return 0, err
 	}
 	out.Seek(stat.Size(), 0)
@@ -143,6 +143,11 @@ func download(url string, p ds.DsPull) (int64, error) {
 			body, _ := ioutil.ReadAll(resp.Body)
 			log.Println("response Body:", string(body))
 		}
+		filesize := stat.Size()
+		out.Close()
+		if filesize == 0 {
+			os.Remove(destfilename)
+		}
 		return 0, err
 	}
 	defer resp.Body.Close()
@@ -153,8 +158,10 @@ func download(url string, p ds.DsPull) (int64, error) {
 
 	n, err := io.Copy(out, resp.Body)
 	if err != nil {
+		out.Close()
 		return 0, err
 	}
+	out.Close()
 	log.Printf("%d bytes downloaded.", n)
 	InsertTagToDb(dpexist, p)
 	return n, nil
