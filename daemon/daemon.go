@@ -24,7 +24,7 @@ var g_ds = new(ds.Ds)
 
 const g_dbfile string = "/var/lib/datahub/datahub.db"
 
-const g_strDpPath string = "/var/lib/datahub/"
+const g_strDpPath string = cmd.GstrDpPath
 
 type StoppableListener struct {
 	*net.UnixListener          //Wrapped listener
@@ -297,7 +297,7 @@ func p2p_pull(rw http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 				if exists := isFileExists(filepathname); !exists {
 					fmt.Println(" filename:", filepathname)
 					//http.NotFound(rw, r)
-					msg.Msg = "tag not found"
+					msg.Msg = fmt.Sprintf("tag:%s not found", sTag)
 					resp, _ := json.Marshal(msg)
 					respStr := string(resp)
 					rw.WriteHeader(http.StatusNotFound)

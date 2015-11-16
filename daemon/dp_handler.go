@@ -41,6 +41,14 @@ func dpPostOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Par
 				sdpDirName = reqJson.Conn + "/" + reqJson.Name
 			}
 
+			dpexist := CheckDataPoolExist(reqJson.Name)
+			if dpexist {
+				msg.Msg = fmt.Sprintf("Datapool %s is already exist, please use another name!", reqJson.Name)
+				resp, _ := json.Marshal(msg)
+				fmt.Fprintln(rw, string(resp))
+				return
+			}
+
 			if err := os.MkdirAll(sdpDirName, 0755); err != nil {
 				msg.Msg = err.Error()
 			} else {
