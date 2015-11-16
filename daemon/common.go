@@ -6,7 +6,7 @@ import (
 )
 
 func CheckDataPoolExist(datapoolname string) (bexist bool) {
-	sqlcheck := fmt.Sprintf("SELECT COUNT(1) FROM DH_DP WHERE DPNAME='%s'", datapoolname)
+	sqlcheck := fmt.Sprintf("SELECT COUNT(1) FROM DH_DP WHERE DPNAME='%s' AND STATUS='A'", datapoolname)
 	row, err := g_ds.QueryRow(sqlcheck)
 	//fmt.Println(sqlcheck)
 	if err != nil {
@@ -25,7 +25,7 @@ func CheckDataPoolExist(datapoolname string) (bexist bool) {
 }
 
 func GetDataPoolDpconn(datapoolname string) (dpconn string) {
-	sqlgetdpconn := fmt.Sprintf("SELECT DPCONN FROM DH_DP WHERE DPNAME='%s'", datapoolname)
+	sqlgetdpconn := fmt.Sprintf("SELECT DPCONN FROM DH_DP WHERE DPNAME='%s'  AND STATUS='A'", datapoolname)
 	//fmt.Println(sqlgetdpconn)
 	row, err := g_ds.QueryRow(sqlgetdpconn)
 	if err != nil {
@@ -38,7 +38,7 @@ func GetDataPoolDpconn(datapoolname string) (dpconn string) {
 }
 
 func GetDataPoolDpid(datapoolname string) (dpid int) {
-	sqlgetdpid := fmt.Sprintf("SELECT DPID FROM DH_DP WHERE DPNAME='%s'", datapoolname)
+	sqlgetdpid := fmt.Sprintf("SELECT DPID FROM DH_DP WHERE DPNAME='%s'  AND STATUS='A'", datapoolname)
 	//fmt.Println(sqlgetdpid)
 	row, err := g_ds.QueryRow(sqlgetdpid)
 	if err != nil {

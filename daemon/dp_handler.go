@@ -36,9 +36,17 @@ func dpPostOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Par
 			} else if reqJson.Conn[0] != '/' {
 				sdpDirName = g_strDpPath + reqJson.Conn
 				reqJson.Conn = sdpDirName
-				sdpDirName = sdpDirName + "/" + reqJson.Name
+				if reqJson.Conn[len(reqJson.Conn)-1] == '/' {
+					sdpDirName = sdpDirName + reqJson.Name
+				} else {
+					sdpDirName = sdpDirName + "/" + reqJson.Name
+				}
 			} else {
-				sdpDirName = reqJson.Conn + "/" + reqJson.Name
+				if reqJson.Conn[len(reqJson.Conn)-1] == '/' {
+					sdpDirName = reqJson.Conn + reqJson.Name
+				} else {
+					sdpDirName = reqJson.Conn + "/" + reqJson.Name
+				}
 			}
 
 			dpexist := CheckDataPoolExist(reqJson.Name)
@@ -190,7 +198,7 @@ func dpDeleteOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.P
 	dpname := ps.ByName("dpname")
 	msg := &ds.MsgResp{}
 
-	sql_dp_rm := fmt.Sprintf(`SELECT DPID, DPTYPE FROM DH_DP WHERE DPNAME ='%s'`, dpname)
+	sql_dp_rm := fmt.Sprintf(`SELECT DPID, DPTYPE FROM DH_DP WHERE DPNAME ='%s' AND STATUS='A'`, dpname)
 	dprows, err := g_ds.QueryRows(sql_dp_rm)
 	if err != nil {
 		msg.Msg = err.Error()

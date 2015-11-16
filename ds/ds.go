@@ -78,7 +78,8 @@ type Data struct {
 	Repository_name string `json:"repname,omitempty"`
 	Dataitem_name   string `json:"itemname,omitempty"`
 	//Usage *DataItemUsage `json:"statis,omitempty"`
-	Tags []Tag `json:"Tags,omitempty"`
+	Tagsnum int   `json:"tags",omitempty`
+	Tags    []Tag `json:"Tags,omitempty"`
 }
 
 /*
