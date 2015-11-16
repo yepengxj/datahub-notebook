@@ -45,10 +45,12 @@ func Login(login bool, args []string) (err error) {
 	//fmt.Println("login return", resp.StatusCode)
 	if resp.StatusCode == 200 {
 		Logged = true
-		fmt.Println("login success.")
+		if login {
+			fmt.Println("login success.")
+		}
 		return
 	} else {
-		if resp.StatusCode == 401 {
+		if resp.StatusCode == 401 && login {
 			fmt.Println("login failed.")
 		}
 		return fmt.Errorf("ERROR %d: login failed.", resp.StatusCode)
