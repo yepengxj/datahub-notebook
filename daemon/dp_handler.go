@@ -7,6 +7,7 @@ import (
 	"github.com/asiainfoLDP/datahub/ds"
 	"github.com/julienschmidt/httprouter"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 )
@@ -111,7 +112,7 @@ func dpGetAllHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Para
 	}
 
 	resp, _ := json.Marshal(result)
-	fmt.Println(string(resp))
+	log.Println(string(resp))
 	fmt.Fprintln(rw, string(resp))
 
 }
@@ -180,7 +181,7 @@ func dpGetOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.Para
 		}
 	}
 	resp, _ := json.Marshal(result)
-	fmt.Println(string(resp))
+	log.Println(string(resp))
 	fmt.Fprintln(rw, string(resp))
 
 }
@@ -244,8 +245,8 @@ func dpDeleteOneHandler(rw http.ResponseWriter, r *http.Request, ps httprouter.P
 		fmt.Fprintln(rw, respStr)
 	}
 	if bresultflag == false {
-		rw.WriteHeader(http.StatusNoContent)
-		msg.Msg = fmt.Sprintf("Datapool %s not found.\n", dpname)
+		rw.WriteHeader(http.StatusOK)
+		msg.Msg = fmt.Sprintf("Datapool %s not found.", dpname)
 		resp, _ := json.Marshal(msg)
 		fmt.Fprintln(rw, string(resp))
 	}

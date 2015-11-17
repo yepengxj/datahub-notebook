@@ -5,6 +5,7 @@ import (
 	"fmt"
 	flag "github.com/asiainfoLDP/datahub/utils/mflag"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -52,7 +53,7 @@ var pidFile *os.File
 func Daemonize() (isDaemon bool, err error) {
 	const errLoc = "daemonigo.Daemonize()"
 	isDaemon = os.Getenv(EnvVarName) == EnvVarValue
-	fmt.Println("IsDaemon: ", isDaemon)
+	log.Println("IsDaemon: ", isDaemon)
 	if WorkDir != "" {
 		if err = os.Chdir(WorkDir); err != nil {
 			err = fmt.Errorf(
@@ -90,7 +91,7 @@ func Daemonize() (isDaemon bool, err error) {
 		}
 
 		if !flag.Parsed() {
-			fmt.Printf(" flag.Parse\n")
+			log.Printf(" flag.Parse\n")
 			flag.Parse()
 		}
 		//fmt.Printf("after flag.Parse\n")
@@ -221,7 +222,7 @@ func Status() (isRunning bool, pr *os.Process, e error) {
 func StartCommand() (*exec.Cmd, error) {
 	const errLoc = "daemonigo.StartCommand()"
 	path, err := filepath.Abs(os.Args[0])
-	fmt.Println("exec path", path)
+	log.Println("exec path", path)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"%s: failed to resolve absolute path of %s, reason -> %s",

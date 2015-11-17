@@ -2,6 +2,7 @@ package daemonigo
 
 import (
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -77,7 +78,7 @@ func stop(process *os.Process) {
 // Helper function which wraps Start() with printing
 // for using in daemon default actions.
 func start() {
-	fmt.Printf("Starting %s...\n", AppName)
+	log.Printf("Starting %s...\n", AppName)
 	if err := Start(1); err != nil {
 		failed(err)
 	} else {
